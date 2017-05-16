@@ -3,8 +3,8 @@ import { Ray } from '../math/Ray';
 import { Matrix4 } from '../math/Matrix4';
 import { Object3D } from '../core/Object3D';
 import { Vector3 } from '../math/Vector3';
-import { LineBasicMaterial } from '../materials/LineBasicMaterial';
 import { BufferGeometry } from '../core/BufferGeometry';
+import { Material } from '../materials/Material';
 import { LineSegments } from './LineSegments';
 
 /**
@@ -25,7 +25,7 @@ function Line( geometry, material, mode ) {
 	this.type = 'Line';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new LineBasicMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new Material();
 
 }
 

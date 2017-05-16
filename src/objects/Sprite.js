@@ -1,6 +1,6 @@
 import { Vector3 } from '../math/Vector3';
 import { Object3D } from '../core/Object3D';
-import { SpriteMaterial } from '../materials/SpriteMaterial';
+import { Material } from '../materials/Material';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -13,7 +13,7 @@ function Sprite( material ) {
 
 	this.type = 'Sprite';
 
-	this.material = ( material !== undefined ) ? material : new SpriteMaterial();
+	this.material = ( material !== undefined ) ? material : new Material();
 
 }
 

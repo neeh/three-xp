@@ -326,18 +326,6 @@ function WebGLRenderer( parameters ) {
 	this.properties = properties;
 	this.state = state;
 
-	// shadow map
-
-	// var shadowMap = new WebGLShadowMap( this, _lights, objects, capabilities );
-
-	// this.shadowMap = shadowMap;
-
-
-	// Plugins
-
-	// var spritePlugin = new SpritePlugin( this, sprites );
-	// var lensFlarePlugin = new LensFlarePlugin( this, lensFlares );
-
 	// API
 
 	this.getContext = function () {
@@ -1128,95 +1116,16 @@ function WebGLRenderer( parameters ) {
 		_infoRender.points = 0;
 
 		if ( renderTarget === undefined ) {
-
 			renderTarget = null;
-
 		}
 
 		this.setRenderTarget( renderTarget );
 
-		//
-
-
-		// var background = scene.background;
-        //
-		// if ( background === null ) {
-
 		state.buffers.color.setClear( _clearColor.r, _clearColor.g, _clearColor.b, _clearAlpha, _premultipliedAlpha );
 
-        /*
-		} else if ( background && background.isColor ) {
-
-			state.buffers.color.setClear( background.r, background.g, background.b, 1, _premultipliedAlpha );
-			forceClear = true;
-
-		}
-        */
-
 		if ( this.autoClear || forceClear ) {
-
 			this.clear( this.autoClearColor, this.autoClearDepth, this.autoClearStencil );
-
 		}
-
-        /*
-		if ( background && background.isCubeTexture ) {
-
-			if ( backgroundBoxCamera === undefined ) {
-
-				backgroundBoxCamera = new PerspectiveCamera();
-
-				backgroundBoxMesh = new Mesh(
-					new BoxBufferGeometry( 5, 5, 5 ),
-					new ShaderMaterial( {
-						uniforms: ShaderLib.cube.uniforms,
-						vertexShader: ShaderLib.cube.vertexShader,
-						fragmentShader: ShaderLib.cube.fragmentShader,
-						side: BackSide,
-						depthTest: false,
-						depthWrite: false,
-						fog: false
-					} )
-				);
-
-			}
-
-			backgroundBoxCamera.projectionMatrix.copy( camera.projectionMatrix );
-
-			backgroundBoxCamera.matrixWorld.extractRotation( camera.matrixWorld );
-			backgroundBoxCamera.matrixWorldInverse.getInverse( backgroundBoxCamera.matrixWorld );
-
-
-			backgroundBoxMesh.material.uniforms[ "tCube" ].value = background;
-			backgroundBoxMesh.modelViewMatrix.multiplyMatrices( backgroundBoxCamera.matrixWorldInverse, backgroundBoxMesh.matrixWorld );
-
-			objects.update( backgroundBoxMesh );
-
-			_this.renderBufferDirect( backgroundBoxCamera, null, backgroundBoxMesh.geometry, backgroundBoxMesh.material, backgroundBoxMesh, null );
-
-		} else if ( background && background.isTexture ) {
-
-			if ( backgroundPlaneCamera === undefined ) {
-
-				backgroundPlaneCamera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-				backgroundPlaneMesh = new Mesh(
-					new PlaneBufferGeometry( 2, 2 ),
-					new MeshBasicMaterial( { depthTest: false, depthWrite: false, fog: false } )
-				);
-
-			}
-
-			backgroundPlaneMesh.material.map = background;
-
-			objects.update( backgroundPlaneMesh );
-
-			_this.renderBufferDirect( backgroundPlaneCamera, null, backgroundPlaneMesh.geometry, backgroundPlaneMesh.material, backgroundPlaneMesh, null );
-
-		}
-        */
-
-		//
 
 		var opaqueObjects = currentRenderList.opaque;
 		var transparentObjects = currentRenderList.transparent;
@@ -1549,18 +1458,6 @@ function WebGLRenderer( parameters ) {
 
 		var uniforms = materialProperties.__webglShader.uniforms;
 
-        /*
-		if ( ! material.isShaderMaterial &&
-			! material.isRawShaderMaterial ||
-			material.clipping === true ) {
-
-			materialProperties.numClippingPlanes = _clipping.numPlanes;
-			materialProperties.numIntersection = _clipping.numIntersection;
-			uniforms.clippingPlanes = _clipping.uniform;
-
-		}
-        */
-
 		// materialProperties.fog = fog;
 
 		// store the light setup it was created for
@@ -1713,31 +1610,12 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			// load material specific uniforms
-			// (shader material also gets them for the sake of genericity)
-
-			// if ( material.isShaderMaterial ||
-			// 	material.isMeshPhongMaterial ||
-			// 	material.isMeshStandardMaterial ||
-			// 	material.envMap ) {
-
 			var uCamPos = p_uniforms.map.cameraPosition;
 			if (uCamPos !== undefined) {
 				uCamPos.setValue(_gl, _vector3.setFromMatrixPosition(camera.matrixWorld));
 			}
 
-			// }
-
-			// if ( material.isMeshPhongMaterial ||
-			// 	material.isMeshLambertMaterial ||
-			// 	material.isMeshBasicMaterial ||
-			// 	material.isMeshStandardMaterial ||
-			// 	material.isShaderMaterial ||
-			// 	material.skinning ) {
-
 			p_uniforms.setValue( _gl, 'viewMatrix', camera.matrixWorldInverse );
-
-			// }
 
 			// p_uniforms.setValue( _gl, 'toneMappingExposure', _this.toneMappingExposure );
 			// p_uniforms.setValue( _gl, 'toneMappingWhitePoint', _this.toneMappingWhitePoint );

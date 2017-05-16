@@ -7,7 +7,7 @@ import { Object3D } from '../core/Object3D';
 import { Triangle } from '../math/Triangle';
 import { Face3 } from '../core/Face3';
 import { DoubleSide, BackSide, TrianglesDrawMode } from '../constants';
-import { MeshBasicMaterial } from '../materials/MeshBasicMaterial';
+import { Material } from '../materials/Material';
 import { BufferGeometry } from '../core/BufferGeometry';
 
 /**
@@ -24,7 +24,7 @@ function Mesh( geometry, material ) {
 	this.type = 'Mesh';
 
 	this.geometry = geometry !== undefined ? geometry : new BufferGeometry();
-	this.material = material !== undefined ? material : new MeshBasicMaterial( { color: Math.random() * 0xffffff } );
+	this.material = material !== undefined ? material : new Material();
 
 	this.drawMode = TrianglesDrawMode;
 
