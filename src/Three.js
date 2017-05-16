@@ -1,6 +1,5 @@
 import './polyfills.js';
 
-export { WebGLRenderTargetCube } from './renderers/WebGLRenderTargetCube.js';
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
 // export { WebGL2Renderer } from './renderers/WebGL2Renderer.js';
@@ -27,7 +26,6 @@ export { VideoTexture } from './textures/VideoTexture.js';
 export { DataTexture } from './textures/DataTexture.js';
 export { CompressedTexture } from './textures/CompressedTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
-export { CanvasTexture } from './textures/CanvasTexture.js';
 export { DepthTexture } from './textures/DepthTexture.js';
 export { Texture } from './textures/Texture.js';
 export * from './geometries/Geometries.js';
@@ -60,7 +58,6 @@ export { Light } from './lights/Light.js';
 export { StereoCamera } from './cameras/StereoCamera.js';
 export { PerspectiveCamera } from './cameras/PerspectiveCamera.js';
 export { OrthographicCamera } from './cameras/OrthographicCamera.js';
-export { CubeCamera } from './cameras/CubeCamera.js';
 export { ArrayCamera } from './cameras/ArrayCamera.js';
 export { Camera } from './cameras/Camera.js';
 export { AudioListener } from './audio/AudioListener.js';

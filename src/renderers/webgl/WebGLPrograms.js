@@ -103,6 +103,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	}
 
+    /*
 	this.getParameters = function ( material, lights, fog, nClipPlanes, nClipIntersection, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
@@ -206,21 +207,24 @@ function WebGLPrograms( renderer, capabilities ) {
 		return parameters;
 
 	};
+    */
 
-	this.getProgramCode = function ( material, parameters ) {
+	this.getProgramCode = function ( material /* parameters */ ) {
 
 		var array = [];
 
+        /*
 		if ( parameters.shaderID ) {
 
 			array.push( parameters.shaderID );
 
 		} else {
+        */
 
-			array.push( material.fragmentShader );
-			array.push( material.vertexShader );
+		array.push( material.fragmentShader );
+		array.push( material.vertexShader );
 
-		}
+		// }
 
 		if ( material.defines !== undefined ) {
 
@@ -233,17 +237,17 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		}
 
-		for ( var i = 0; i < parameterNames.length; i ++ ) {
-
-			array.push( parameters[ parameterNames[ i ] ] );
-
-		}
+		// for ( var i = 0; i < parameterNames.length; i ++ ) {
+        //
+		// 	array.push( parameters[ parameterNames[ i ] ] );
+        //
+		// }
 
 		return array.join();
 
 	};
 
-	this.acquireProgram = function ( material, parameters, code ) {
+	this.acquireProgram = function ( material, /* parameters, */ code ) {
 
 		var program;
 
@@ -265,7 +269,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 		if ( program === undefined ) {
 
-			program = new WebGLProgram( renderer, code, material, parameters );
+			program = new WebGLProgram( renderer, code, material, /* parameters */ );
 			programs.push( program );
 
 		}

@@ -194,7 +194,7 @@ function unrollLoops( string ) {
 
 }
 
-function WebGLProgram( renderer, code, material, parameters ) {
+function WebGLProgram( renderer, code, material /* parameters */ ) {
 
 	var gl = renderer.context;
 
@@ -206,6 +206,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 	var shadowMapTypeDefine = 'SHADOWMAP_TYPE_BASIC';
 
+    /*
 	if ( parameters.shadowMapType === PCFShadowMap ) {
 
 		shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF';
@@ -215,11 +216,13 @@ function WebGLProgram( renderer, code, material, parameters ) {
 		shadowMapTypeDefine = 'SHADOWMAP_TYPE_PCF_SOFT';
 
 	}
+    */
 
 	var envMapTypeDefine = 'ENVMAP_TYPE_CUBE';
 	var envMapModeDefine = 'ENVMAP_MODE_REFLECTION';
 	var envMapBlendingDefine = 'ENVMAP_BLENDING_MULTIPLY';
 
+    /*
 	if ( parameters.envMap ) {
 
 		switch ( material.envMap.mapping ) {
@@ -271,6 +274,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 		}
 
 	}
+    */
 
 	var gammaFactorDefine = ( renderer.gammaFactor > 0 ) ? renderer.gammaFactor : 1.0;
 
@@ -278,7 +282,7 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 	//
 
-	var customExtensions = generateExtensions( extensions, parameters, renderer.extensions );
+	// var customExtensions = generateExtensions( extensions, parameters, renderer.extensions );
 
 	var customDefines = generateDefines( defines );
 
@@ -286,28 +290,12 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 	var program = gl.createProgram();
 
-	var prefixVertex, prefixFragment;
+	// if ( material.isRawShaderMaterial ) {
 
-	if ( material.isRawShaderMaterial ) {
+	var prefixVertex = [customDefines, '\n'].filter(filterEmptyLine).join('\n');
+	var prefixFragment = [/*customExtensions, */customDefines, '\n'].filter(filterEmptyLine).join('\n');
 
-		prefixVertex = [
-
-			customDefines,
-
-			'\n'
-
-		].filter( filterEmptyLine ).join( '\n' );
-
-		prefixFragment = [
-
-			customExtensions,
-			customDefines,
-
-			'\n'
-
-		].filter( filterEmptyLine ).join( '\n' );
-
-	} else {
+	/* } else {
 
 		prefixVertex = [
 
@@ -492,12 +480,13 @@ function WebGLProgram( renderer, code, material, parameters ) {
 		].filter( filterEmptyLine ).join( '\n' );
 
 	}
+    */
 
-	vertexShader = parseIncludes( vertexShader, parameters );
-	vertexShader = replaceLightNums( vertexShader, parameters );
-
-	fragmentShader = parseIncludes( fragmentShader, parameters );
-	fragmentShader = replaceLightNums( fragmentShader, parameters );
+	// vertexShader = parseIncludes( vertexShader, parameters );
+	// vertexShader = replaceLightNums( vertexShader, parameters );
+    //
+	// fragmentShader = parseIncludes( fragmentShader, parameters );
+	// fragmentShader = replaceLightNums( fragmentShader, parameters );
 
 	if ( ! material.isShaderMaterial ) {
 
@@ -524,12 +513,12 @@ function WebGLProgram( renderer, code, material, parameters ) {
 
 		gl.bindAttribLocation( program, 0, material.index0AttributeName );
 
-	} else if ( parameters.morphTargets === true ) {
+	} /*else if ( parameters.morphTargets === true ) {
 
 		// programs with morphTargets displace position out of attribute 0
 		gl.bindAttribLocation( program, 0, 'position' );
 
-	}
+	}*/
 
 	gl.linkProgram( program );
 

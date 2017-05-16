@@ -213,129 +213,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 	}
 
-	function setTextureCube( texture, slot ) {
-
-		var textureProperties = properties.get( texture );
-
-		if ( texture.image.length === 6 ) {
-
-			if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
-
-				if ( ! textureProperties.__image__webglTextureCube ) {
-
-					texture.addEventListener( 'dispose', onTextureDispose );
-
-					textureProperties.__image__webglTextureCube = _gl.createTexture();
-
-					infoMemory.textures ++;
-
-				}
-
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube );
-
-				_gl.pixelStorei( _gl.UNPACK_FLIP_Y_WEBGL, texture.flipY );
-
-				var isCompressed = ( texture && texture.isCompressedTexture );
-				var isDataTexture = ( texture.image[ 0 ] && texture.image[ 0 ].isDataTexture );
-
-				var cubeImage = [];
-
-				for ( var i = 0; i < 6; i ++ ) {
-
-					if ( ! isCompressed && ! isDataTexture ) {
-
-						cubeImage[ i ] = clampToMaxSize( texture.image[ i ], capabilities.maxCubemapSize );
-
-					} else {
-
-						cubeImage[ i ] = isDataTexture ? texture.image[ i ].image : texture.image[ i ];
-
-					}
-
-				}
-
-				var image = cubeImage[ 0 ],
-				isPowerOfTwoImage = isPowerOfTwo( image ),
-				glFormat = paramThreeToGL( texture.format ),
-				glType = paramThreeToGL( texture.type );
-
-				setTextureParameters( _gl.TEXTURE_CUBE_MAP, texture, isPowerOfTwoImage );
-
-				for ( var i = 0; i < 6; i ++ ) {
-
-					if ( ! isCompressed ) {
-
-						if ( isDataTexture ) {
-
-							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, cubeImage[ i ].width, cubeImage[ i ].height, 0, glFormat, glType, cubeImage[ i ].data );
-
-						} else {
-
-							state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, glFormat, glFormat, glType, cubeImage[ i ] );
-
-						}
-
-					} else {
-
-						var mipmap, mipmaps = cubeImage[ i ].mipmaps;
-
-						for ( var j = 0, jl = mipmaps.length; j < jl; j ++ ) {
-
-							mipmap = mipmaps[ j ];
-
-							if ( texture.format !== RGBAFormat && texture.format !== RGBFormat ) {
-
-								if ( state.getCompressedTextureFormats().indexOf( glFormat ) > - 1 ) {
-
-									state.compressedTexImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, mipmap.data );
-
-								} else {
-
-									console.warn( "THREE.WebGLRenderer: Attempt to load unsupported compressed texture format in .setTextureCube()" );
-
-								}
-
-							} else {
-
-								state.texImage2D( _gl.TEXTURE_CUBE_MAP_POSITIVE_X + i, j, glFormat, mipmap.width, mipmap.height, 0, glFormat, glType, mipmap.data );
-
-							}
-
-						}
-
-					}
-
-				}
-
-				if ( texture.generateMipmaps && isPowerOfTwoImage ) {
-
-					_gl.generateMipmap( _gl.TEXTURE_CUBE_MAP );
-
-				}
-
-				textureProperties.__version = texture.version;
-
-				if ( texture.onUpdate ) texture.onUpdate( texture );
-
-			} else {
-
-				state.activeTexture( _gl.TEXTURE0 + slot );
-				state.bindTexture( _gl.TEXTURE_CUBE_MAP, textureProperties.__image__webglTextureCube );
-
-			}
-
-		}
-
-	}
-
-	function setTextureCubeDynamic( texture, slot ) {
-
-		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_CUBE_MAP, properties.get( texture ).__webglTexture );
-
-	}
-
 	function setTextureParameters( textureType, texture, isPowerOfTwoImage ) {
 
 		var extension;
@@ -779,8 +656,6 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 	}
 
 	this.setTexture2D = setTexture2D;
-	this.setTextureCube = setTextureCube;
-	this.setTextureCubeDynamic = setTextureCubeDynamic;
 	this.setupRenderTarget = setupRenderTarget;
 	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
 
