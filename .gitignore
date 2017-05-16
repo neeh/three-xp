@@ -1,0 +1,11 @@
+.DS_Store
+*.swp
+.project
+node_modules
+.idea/
+.vscode/
+npm-debug.log
+.jshintrc
+build/
+src-bak/
+copy.sh

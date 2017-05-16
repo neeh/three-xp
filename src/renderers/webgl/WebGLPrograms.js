@@ -9,6 +9,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	var programs = [];
 
+    /*
 	var shaderIDs = {
 		MeshDepthMaterial: 'depth',
 		MeshNormalMaterial: 'normal',
@@ -35,6 +36,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering"
 	];
+    */
 
 
 	function allocateBones( object ) {
