@@ -1389,29 +1389,12 @@ function WebGLRenderer( parameters ) {
 
 		if ( programChange ) {
 
-            /*
-			if ( parameters.shaderID ) {
-
-				var shader = ShaderLib[ parameters.shaderID ];
-
-				materialProperties.__webglShader = {
-					name: material.type,
-					uniforms: UniformsUtils.clone( shader.uniforms ),
-					vertexShader: shader.vertexShader,
-					fragmentShader: shader.fragmentShader
-				};
-
-			} else {
-            */
-
 			materialProperties.__webglShader = {
 				name: material.type,
 				uniforms: material.uniforms,
 				vertexShader: material.vertexShader,
 				fragmentShader: material.fragmentShader
 			};
-
-			// }
 
 			material.__webglShader = materialProperties.__webglShader;
 
