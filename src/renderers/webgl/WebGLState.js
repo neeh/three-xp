@@ -394,15 +394,11 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	}
 
-	function initAttributes() {
-
-		for ( var i = 0, l = newAttributes.length; i < l; i ++ ) {
-
-			newAttributes[ i ] = 0;
-
-		}
-
-	}
+    function initAttributes() {
+        for (var i = 0, l = newAttributes.length; i < l; i++) {
+            newAttributes[i] = 0;
+        }
+    }
 
 	function enableAttribute( attribute ) {
 

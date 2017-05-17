@@ -9,6 +9,7 @@ import { NoToneMapping, AddOperation, MixOperation, MultiplyOperation, Equirecta
 
 var programIdCount = 0;
 
+/*
 function getEncodingComponents( encoding ) {
 
 	switch ( encoding ) {
@@ -78,6 +79,7 @@ function getToneMappingFunction( functionName, toneMapping ) {
 	return "vec3 " + functionName + "( vec3 color ) { return " + toneMappingName + "ToneMapping( color ); }";
 
 }
+*/
 
 function generateExtensions( extensions, parameters, rendererExtensions ) {
 
@@ -94,104 +96,82 @@ function generateExtensions( extensions, parameters, rendererExtensions ) {
 
 }
 
-function generateDefines( defines ) {
+function generateDefines(defines) {
+    var str = '';
 
-	var chunks = [];
+    var newLine = false;
+    for (var name in defines) {
+        var value = defines[name];
+        if (value === false) continue;
 
-	for ( var name in defines ) {
+        if (newLine) {
+            str += '\n';
+        } else {
+            newLine = true;
+        }
+        str += '#define ' + name;
+        if (value !== '') {
+            str += ' ' + value;
+        }
+    }
 
-		var value = defines[ name ];
-
-		if ( value === false ) continue;
-
-		chunks.push( '#define ' + name + ' ' + value );
-
-	}
-
-	return chunks.join( '\n' );
-
+    return str;
 }
 
-function fetchAttributeLocations( gl, program, identifiers ) {
+function fetchAttributeLocations(gl, program, identifiers) {
+    var attributes = {};
+    var n = gl.getProgramParameter(program, gl.ACTIVE_ATTRIBUTES);
 
-	var attributes = {};
+    for (var i = 0; i < n; i++) {
+        var info = gl.getActiveAttrib(program, i);
+        var name = info.name;
+        attributes[name] = gl.getAttribLocation(program, name);
+    }
 
-	var n = gl.getProgramParameter( program, gl.ACTIVE_ATTRIBUTES );
-
-	for ( var i = 0; i < n; i ++ ) {
-
-		var info = gl.getActiveAttrib( program, i );
-		var name = info.name;
-
-		// console.log("THREE.WebGLProgram: ACTIVE VERTEX ATTRIBUTE:", name, i );
-
-		attributes[ name ] = gl.getAttribLocation( program, name );
-
-	}
-
-	return attributes;
-
+    return attributes;
 }
 
-function filterEmptyLine( string ) {
-
-	return string !== '';
-
+function filterEmptyLine(string) {
+    return string !== '';
 }
 
+/*
 function replaceLightNums( string, parameters ) {
-
 	return string
 		.replace( /NUM_DIR_LIGHTS/g, parameters.numDirLights )
 		.replace( /NUM_SPOT_LIGHTS/g, parameters.numSpotLights )
 		.replace( /NUM_RECT_AREA_LIGHTS/g, parameters.numRectAreaLights )
 		.replace( /NUM_POINT_LIGHTS/g, parameters.numPointLights )
 		.replace( /NUM_HEMI_LIGHTS/g, parameters.numHemiLights );
+}
+*/
 
+function parseIncludes(string) {
+    var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
+
+    function replace(match, include) {
+        var replace = ShaderChunk[include];
+        if (replace === undefined) {
+            throw new Error('Can not resolve #include <' + include + '>');
+        }
+        return parseIncludes(replace);
+    }
+
+    return string.replace(pattern, replace);
 }
 
-function parseIncludes( string ) {
+function unrollLoops(string) {
+    var pattern = /for \(int i \= (\d+)\; i < (\d+)\; i\+\+\) \{([\s\S]+?)(?=\})\}/g;
 
-	var pattern = /^[ \t]*#include +<([\w\d.]+)>/gm;
+    function replace(match, start, end, snippet) {
+        var unroll = '';
+        for (var i = parseInt(start); i < parseInt(end); i++) {
+            unroll += snippet.replace(/\[i\]/g, '[' + i + ']');
+        }
+        return unroll;
+    }
 
-	function replace( match, include ) {
-
-		var replace = ShaderChunk[ include ];
-
-		if ( replace === undefined ) {
-
-			throw new Error( 'Can not resolve #include <' + include + '>' );
-
-		}
-
-		return parseIncludes( replace );
-
-	}
-
-	return string.replace( pattern, replace );
-
-}
-
-function unrollLoops( string ) {
-
-	var pattern = /for \( int i \= (\d+)\; i < (\d+)\; i \+\+ \) \{([\s\S]+?)(?=\})\}/g;
-
-	function replace( match, start, end, snippet ) {
-
-		var unroll = '';
-
-		for ( var i = parseInt( start ); i < parseInt( end ); i ++ ) {
-
-			unroll += snippet.replace( /\[ i \]/g, '[ ' + i + ' ]' );
-
-		}
-
-		return unroll;
-
-	}
-
-	return string.replace( pattern, replace );
-
+    return string.replace(pattern, replace);
 }
 
 function WebGLProgram( renderer, code, material /* parameters */ ) {
@@ -234,21 +214,21 @@ function WebGLProgram( renderer, code, material /* parameters */ ) {
 	var glVertexShader = WebGLShader( gl, gl.VERTEX_SHADER, vertexGlsl );
 	var glFragmentShader = WebGLShader( gl, gl.FRAGMENT_SHADER, fragmentGlsl );
 
-	gl.attachShader( program, glVertexShader );
-	gl.attachShader( program, glFragmentShader );
+    gl.attachShader(program, glVertexShader);
+    gl.attachShader(program, glFragmentShader);
 
 	// Force a particular attribute to index 0.
 
-	if ( material.index0AttributeName !== undefined ) {
+	/*if ( material.index0AttributeName !== undefined ) {
 
 		gl.bindAttribLocation( program, 0, material.index0AttributeName );
 
-	} /*else if ( parameters.morphTargets === true ) {
+	} else*/ if ( material.morphTargets === true ) {
 
 		// programs with morphTargets displace position out of attribute 0
 		gl.bindAttribLocation( program, 0, 'position' );
 
-	}*/
+	}
 
 	gl.linkProgram( program );
 
@@ -278,116 +258,60 @@ function WebGLProgram( renderer, code, material /* parameters */ ) {
 
 	}
 
-	if ( haveDiagnostics ) {
+    if (haveDiagnostics) {
+        this.diagnostics = {
+            runnable: runnable,
+            material: material,
+            programLog: programLog,
+            vertexShader: {
+                log: vertexLog,
+                prefix: prefixVertex
+            },
+            fragmentShader: {
+                log: fragmentLog,
+                prefix: prefixFragment
+            }
+        };
+    }
 
-		this.diagnostics = {
+    // clean up
+    gl.deleteShader( glVertexShader );
+    gl.deleteShader( glFragmentShader );
 
-			runnable: runnable,
-			material: material,
+    // set up caching for uniform locations
+    var cachedUniforms;
 
-			programLog: programLog,
+    this.getUniforms = function () {
+        if (cachedUniforms === undefined) {
+            cachedUniforms = new WebGLUniforms(gl, program, renderer);
+        }
+        return cachedUniforms;
+    };
 
-			vertexShader: {
+    // set up caching for attribute locations
+    var cachedAttributes;
 
-				log: vertexLog,
-				prefix: prefixVertex
+    this.getAttributes = function () {
+        if (cachedAttributes === undefined) {
+            cachedAttributes = fetchAttributeLocations(gl, program);
+        }
+        return cachedAttributes;
+    };
 
-			},
+    // free resource
+    this.destroy = function() {
+        gl.deleteProgram(program);
+        this.program = undefined;
+    };
 
-			fragmentShader: {
+    this.id = programIdCount ++;
+    this.code = code;
+    this.usedTimes = 1;
+    this.program = program;
+    this.vertexShader = glVertexShader;
+    this.fragmentShader = glFragmentShader;
 
-				log: fragmentLog,
-				prefix: prefixFragment
-
-			}
-
-		};
-
-	}
-
-	// clean up
-
-	gl.deleteShader( glVertexShader );
-	gl.deleteShader( glFragmentShader );
-
-	// set up caching for uniform locations
-
-	var cachedUniforms;
-
-	this.getUniforms = function() {
-
-		if ( cachedUniforms === undefined ) {
-
-			cachedUniforms =
-				new WebGLUniforms( gl, program, renderer );
-
-		}
-
-		return cachedUniforms;
-
-	};
-
-	// set up caching for attribute locations
-
-	var cachedAttributes;
-
-	this.getAttributes = function() {
-
-		if ( cachedAttributes === undefined ) {
-
-			cachedAttributes = fetchAttributeLocations( gl, program );
-
-		}
-
-		return cachedAttributes;
-
-	};
-
-	// free resource
-
-	this.destroy = function() {
-
-		gl.deleteProgram( program );
-		this.program = undefined;
-
-	};
-
-	// DEPRECATED
-
-	Object.defineProperties( this, {
-
-		uniforms: {
-			get: function() {
-
-				console.warn( 'THREE.WebGLProgram: .uniforms is now .getUniforms().' );
-				return this.getUniforms();
-
-			}
-		},
-
-		attributes: {
-			get: function() {
-
-				console.warn( 'THREE.WebGLProgram: .attributes is now .getAttributes().' );
-				return this.getAttributes();
-
-			}
-		}
-
-	} );
-
-
-	//
-
-	this.id = programIdCount ++;
-	this.code = code;
-	this.usedTimes = 1;
-	this.program = program;
-	this.vertexShader = glVertexShader;
-	this.fragmentShader = glFragmentShader;
-
-	return this;
-
+    return this;
 }
 
 export { WebGLProgram };

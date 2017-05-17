@@ -61,6 +61,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	}
 
+    /*
 	function getTextureEncodingFromMap( map, gammaOverrideLinear ) {
 
 		var encoding;
@@ -90,6 +91,7 @@ function WebGLPrograms( renderer, capabilities ) {
 		return encoding;
 
 	}
+    */
 
     /*
 	this.getParameters = function ( material, lights, fog, nClipPlanes, nClipIntersection, object ) {
@@ -197,7 +199,7 @@ function WebGLPrograms( renderer, capabilities ) {
 	};
     */
 
-	this.getProgramCode = function ( material /* parameters */ ) {
+	this.getProgramCode = function ( material ) {
 
 		var array = [];
 

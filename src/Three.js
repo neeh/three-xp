@@ -2,7 +2,6 @@ import './polyfills.js';
 
 export { WebGLRenderTarget } from './renderers/WebGLRenderTarget.js';
 export { WebGLRenderer } from './renderers/WebGLRenderer.js';
-export { UniformsLib } from './renderers/shaders/UniformsLib.js';
 export { UniformsUtils } from './renderers/shaders/UniformsUtils.js';
 export { ShaderChunk } from './renderers/shaders/ShaderChunk.js';
 export { FogExp2 } from './scenes/FogExp2.js';
