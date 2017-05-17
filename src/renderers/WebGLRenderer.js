@@ -519,7 +519,7 @@ function WebGLRenderer( parameters ) {
         objects.clear(); // TEMP
 
         _glVersion++;
-	}
+    }
 
 	function onMaterialDispose( event ) {
 
@@ -770,7 +770,7 @@ function WebGLRenderer( parameters ) {
 
 		if ( updateBuffers ) {
 
-			setupVertexAttributes( material, program, geometry );
+            setupVertexAttributes(program, geometry);
 
 			if ( index !== null ) {
 
@@ -881,8 +881,7 @@ function WebGLRenderer( parameters ) {
 
 	};
 
-    // TODO: Remove material from here
-    function setupVertexAttributes(material, program, geometry, startIndex) {
+    function setupVertexAttributes(program, geometry, startIndex) {
         if (geometry && geometry.isInstancedBufferGeometry) {
             if (extensions.get('ANGLE_instanced_arrays') === null) {
                 console.error('THREE.WebGLRenderer.setupVertexAttributes: using THREE.InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.');
@@ -896,8 +895,6 @@ function WebGLRenderer( parameters ) {
 
         var geometryAttributes = geometry.attributes;
         var programAttributes = program.getAttributes();
-
-        // var materialDefaultAttributeValues = material.defaultAttributeValues;
 
         for (var name in programAttributes) {
             var programAttribute = programAttributes[ name ];
@@ -942,24 +939,7 @@ function WebGLRenderer( parameters ) {
                         _gl.bindBuffer(_gl.ARRAY_BUFFER, buffer);
                         _gl.vertexAttribPointer(programAttribute, size, type, normalized, 0, startIndex * size * bytesPerElement);
                     }
-                } /*else if (materialDefaultAttributeValues !== undefined) {
-                    var value = materialDefaultAttributeValues[name];
-                    if (value !== undefined) {
-                        switch (value.length) {
-                            case 2:
-                                _gl.vertexAttrib2fv( programAttribute, value );
-                                break;
-                            case 3:
-                                _gl.vertexAttrib3fv( programAttribute, value );
-                                break;
-                            case 4:
-                                _gl.vertexAttrib4fv( programAttribute, value );
-                                break;
-                            default:
-                                _gl.vertexAttrib1fv( programAttribute, value );
-                        }
-                    }
-                }*/ else {
+                } else {
                     console.log('THREE.WebGLRenderer: No attribute defined for "' + name + '"', geometryAttribute);
                 }
             }

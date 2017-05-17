@@ -25,7 +25,6 @@ export { CompressedTexture } from './textures/CompressedTexture.js';
 export { CubeTexture } from './textures/CubeTexture.js';
 export { DepthTexture } from './textures/DepthTexture.js';
 export { Texture } from './textures/Texture.js';
-export * from './geometries/Geometries.js';
 export { Material } from './materials/Material.js';
 export { RawShaderMaterial } from './materials/RawShaderMaterial.js';
 export { SpotLightShadow } from './lights/SpotLightShadow.js';
