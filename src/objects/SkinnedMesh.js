@@ -124,27 +124,7 @@ SkinnedMesh.prototype = Object.assign( Object.create( Mesh.prototype ), {
 
 		var scale, i;
 
-		if ( this.geometry && this.geometry.isGeometry ) {
-
-			for ( i = 0; i < this.geometry.skinWeights.length; i ++ ) {
-
-				var sw = this.geometry.skinWeights[ i ];
-
-				scale = 1.0 / sw.lengthManhattan();
-
-				if ( scale !== Infinity ) {
-
-					sw.multiplyScalar( scale );
-
-				} else {
-
-					sw.set( 1, 0, 0, 0 ); // do something reasonable
-
-				}
-
-			}
-
-		} else if ( this.geometry && this.geometry.isBufferGeometry ) {
+		if ( this.geometry ) {
 
 			var vec = new Vector4();
 

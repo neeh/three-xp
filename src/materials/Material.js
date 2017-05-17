@@ -10,8 +10,7 @@ import { _Math } from '../math/Math';
 var materialId = 0;
 
 function Material(parameters) {
-    this.id = materialId++;
-    // Object.defineProperty( this, 'id', { value: materialId ++ } );
+    this.id = ++materialId;
 
     this.properties = {
         program: null,

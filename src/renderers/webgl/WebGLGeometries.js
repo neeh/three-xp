@@ -66,21 +66,8 @@ function WebGLGeometries( gl, attributes, infoMemory ) {
 
 		geometry.addEventListener( 'dispose', onGeometryDispose );
 
-		if ( geometry.isBufferGeometry ) {
-
-			buffergeometry = geometry;
-
-		} else if ( geometry.isGeometry ) {
-
-			if ( geometry._bufferGeometry === undefined ) {
-
-				geometry._bufferGeometry = new BufferGeometry().setFromObject( object );
-
-			}
-
-			buffergeometry = geometry._bufferGeometry;
-
-		}
+        // Here was the conversion from Geometry to BufferGeometry
+		buffergeometry = geometry;
 
 		geometries[ geometry.id ] = buffergeometry;
 

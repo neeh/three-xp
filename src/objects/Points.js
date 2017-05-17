@@ -87,45 +87,31 @@ Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 			}
 
-			if ( geometry.isBufferGeometry ) {
+			var index = geometry.index;
+			var attributes = geometry.attributes;
+			var positions = attributes.position.array;
 
-				var index = geometry.index;
-				var attributes = geometry.attributes;
-				var positions = attributes.position.array;
+			if ( index !== null ) {
 
-				if ( index !== null ) {
+				var indices = index.array;
 
-					var indices = index.array;
+				for ( var i = 0, il = indices.length; i < il; i ++ ) {
 
-					for ( var i = 0, il = indices.length; i < il; i ++ ) {
+					var a = indices[ i ];
 
-						var a = indices[ i ];
+					position.fromArray( positions, a * 3 );
 
-						position.fromArray( positions, a * 3 );
-
-						testPoint( position, a );
-
-					}
-
-				} else {
-
-					for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
-
-						position.fromArray( positions, i * 3 );
-
-						testPoint( position, i );
-
-					}
+					testPoint( position, a );
 
 				}
 
 			} else {
 
-				var vertices = geometry.vertices;
+				for ( var i = 0, l = positions.length / 3; i < l; i ++ ) {
 
-				for ( var i = 0, l = vertices.length; i < l; i ++ ) {
+					position.fromArray( positions, i * 3 );
 
-					testPoint( vertices[ i ], i );
+					testPoint( position, i );
 
 				}
 

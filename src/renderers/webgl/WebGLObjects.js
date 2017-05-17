@@ -17,11 +17,11 @@ function WebGLObjects( gl, geometries, infoRender ) {
 
 		if ( updateList[ buffergeometry.id ] !== frame ) {
 
+            /*
 			if ( geometry.isGeometry ) {
-
 				buffergeometry.updateFromObject( object );
-
 			}
+            */
 
 			geometries.update( buffergeometry );
 
