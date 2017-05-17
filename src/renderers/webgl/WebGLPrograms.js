@@ -237,7 +237,7 @@ function WebGLPrograms( renderer, capabilities ) {
 
 	};
 
-	this.acquireProgram = function ( material, /* parameters, */ code ) {
+	this.acquireProgram = function ( material, code ) {
 
 		var program;
 
