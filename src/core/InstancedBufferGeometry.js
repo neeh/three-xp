@@ -37,7 +37,7 @@ InstancedBufferGeometry.prototype = Object.assign( Object.create( BufferGeometry
 
 		if ( index !== null ) {
 
-			this.setIndex( index.clone() );
+			this.index = index.clone();
 
 		}
 
