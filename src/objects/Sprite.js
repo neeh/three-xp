@@ -1,6 +1,6 @@
 import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
-import { Material } from '../materials/Material';
+import { SceneNode } from '../core/SceneNode';
+import { Material } from '../core/Material';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -9,7 +9,7 @@ import { Material } from '../materials/Material';
 
 function Sprite( material ) {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'Sprite';
 
@@ -17,7 +17,7 @@ function Sprite( material ) {
 
 }
 
-Sprite.prototype = Object.assign( Object.create( Object3D.prototype ), {
+Sprite.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: Sprite,
 

@@ -3,11 +3,11 @@ import { Vector2 } from '../math/Vector2';
 import { Sphere } from '../math/Sphere';
 import { Ray } from '../math/Ray';
 import { Matrix4 } from '../math/Matrix4';
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 import { Triangle } from '../math/Triangle';
 import { Face3 } from '../core/Face3';
 import { DoubleSide, BackSide, TrianglesDrawMode } from '../constants';
-import { Material } from '../materials/Material';
+import { Material } from '../core/Material';
 import { BufferGeometry } from '../core/BufferGeometry';
 
 /**
@@ -19,7 +19,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
 
 function Mesh( geometry, material ) {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'Mesh';
 
@@ -32,7 +32,7 @@ function Mesh( geometry, material ) {
 
 }
 
-Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
+Mesh.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: Mesh,
 
@@ -46,7 +46,7 @@ Mesh.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	copy: function ( source ) {
 
-		Object3D.prototype.copy.call( this, source );
+		SceneNode.prototype.copy.call( this, source );
 
 		this.drawMode = source.drawMode;
 

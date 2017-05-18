@@ -1,9 +1,9 @@
 import { Sphere } from '../math/Sphere';
 import { Ray } from '../math/Ray';
 import { Matrix4 } from '../math/Matrix4';
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 import { Vector3 } from '../math/Vector3';
-import { Material } from '../materials/Material';
+import { Material } from '../core/Material';
 import { BufferGeometry } from '../core/BufferGeometry';
 
 /**
@@ -12,7 +12,7 @@ import { BufferGeometry } from '../core/BufferGeometry';
 
 function Points( geometry, material ) {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'Points';
 
@@ -21,7 +21,7 @@ function Points( geometry, material ) {
 
 }
 
-Points.prototype = Object.assign( Object.create( Object3D.prototype ), {
+Points.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: Points,
 

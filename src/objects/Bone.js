@@ -1,4 +1,4 @@
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -8,13 +8,13 @@ import { Object3D } from '../core/Object3D';
 
 function Bone() {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'Bone';
 
 }
 
-Bone.prototype = Object.assign( Object.create( Object3D.prototype ), {
+Bone.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: Bone,
 

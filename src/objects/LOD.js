@@ -1,5 +1,5 @@
 import { Vector3 } from '../math/Vector3';
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 
 /**
  * @author mikael emtinger / http://gomo.se/
@@ -9,7 +9,7 @@ import { Object3D } from '../core/Object3D';
 
 function LOD() {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'LOD';
 
@@ -22,13 +22,13 @@ function LOD() {
 
 }
 
-LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
+LOD.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: LOD,
 
 	copy: function ( source ) {
 
-		Object3D.prototype.copy.call( this, source, false );
+		SceneNode.prototype.copy.call( this, source, false );
 
 		var levels = source.levels;
 
@@ -149,7 +149,7 @@ LOD.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	toJSON: function ( meta ) {
 
-		var data = Object3D.prototype.toJSON.call( this, meta );
+		var data = SceneNode.prototype.toJSON.call( this, meta );
 
 		data.object.levels = [];
 
