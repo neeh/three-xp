@@ -6,12 +6,12 @@
 
 import { Matrix4 } from '../math/Matrix4';
 import { Quaternion } from '../math/Quaternion';
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 import { Vector3 } from '../math/Vector3';
 
 function Camera() {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'Camera';
 
@@ -20,7 +20,7 @@ function Camera() {
 
 }
 
-Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
+Camera.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: Camera,
 
@@ -28,7 +28,7 @@ Camera.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 	copy: function ( source ) {
 
-		Object3D.prototype.copy.call( this, source );
+		SceneNode.prototype.copy.call( this, source );
 
 		this.matrixWorldInverse.copy( source.matrixWorldInverse );
 		this.projectionMatrix.copy( source.projectionMatrix );

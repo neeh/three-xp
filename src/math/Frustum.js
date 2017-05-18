@@ -80,6 +80,7 @@ Object.assign( Frustum.prototype, {
 
 	},
 
+    /* UNUSED
 	intersectsObject: function () {
 
 		var sphere = new Sphere();
@@ -115,6 +116,7 @@ Object.assign( Frustum.prototype, {
 		};
 
 	}(),
+    */
 
 	intersectsSphere: function ( sphere ) {
 

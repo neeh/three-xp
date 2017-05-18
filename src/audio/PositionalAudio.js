@@ -4,7 +4,7 @@
 
 import { Vector3 } from '../math/Vector3';
 import { Audio } from './Audio';
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 
 function PositionalAudio( listener ) {
 
@@ -79,7 +79,7 @@ PositionalAudio.prototype = Object.assign( Object.create( Audio.prototype ), {
 
 		return function updateMatrixWorld( force ) {
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+			SceneNode.prototype.updateMatrixWorld.call( this, force );
 
 			position.setFromMatrixPosition( this.matrixWorld );
 

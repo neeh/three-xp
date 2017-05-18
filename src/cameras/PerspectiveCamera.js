@@ -1,5 +1,5 @@
 import { Camera } from './Camera';
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 import { _Math } from '../math/Math';
 
 /**
@@ -199,7 +199,7 @@ PerspectiveCamera.prototype = Object.assign( Object.create( Camera.prototype ), 
 
 	toJSON: function ( meta ) {
 
-		var data = Object3D.prototype.toJSON.call( this, meta );
+		var data = SceneNode.prototype.toJSON.call( this, meta );
 
 		data.object.fov = this.fov;
 		data.object.zoom = this.zoom;

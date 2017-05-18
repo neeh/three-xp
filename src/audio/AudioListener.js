@@ -4,12 +4,12 @@
 
 import { Vector3 } from '../math/Vector3';
 import { Quaternion } from '../math/Quaternion';
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 import { AudioContext } from './AudioContext';
 
 function AudioListener() {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'AudioListener';
 
@@ -22,7 +22,7 @@ function AudioListener() {
 
 }
 
-AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
+AudioListener.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: AudioListener,
 
@@ -92,7 +92,7 @@ AudioListener.prototype = Object.assign( Object.create( Object3D.prototype ), {
 
 		return function updateMatrixWorld( force ) {
 
-			Object3D.prototype.updateMatrixWorld.call( this, force );
+			SceneNode.prototype.updateMatrixWorld.call( this, force );
 
 			var listener = this.context.listener;
 			var up = this.up;

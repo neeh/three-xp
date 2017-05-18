@@ -643,7 +643,7 @@ Object.assign( PropertyBinding.prototype, { // prototype, continued
 
 		} else if ( nodeProperty.fromArray !== undefined && nodeProperty.toArray !== undefined ) {
 
-			// must use copy for Object3D.Euler/Quaternion
+			// must use copy for SceneNode.Euler/Quaternion
 
 			bindingType = this.BindingType.HasFromToArray;
 

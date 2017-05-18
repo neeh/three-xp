@@ -3,11 +3,11 @@
  * @author Reece Aaron Lecrivain / http://reecenotes.com/
  */
 
-import { Object3D } from '../core/Object3D';
+import { SceneNode } from '../core/SceneNode';
 
 function Audio( listener ) {
 
-	Object3D.call( this );
+	SceneNode.call( this );
 
 	this.type = 'Audio';
 
@@ -30,7 +30,7 @@ function Audio( listener ) {
 
 }
 
-Audio.prototype = Object.assign( Object.create( Object3D.prototype ), {
+Audio.prototype = Object.assign( Object.create( SceneNode.prototype ), {
 
 	constructor: Audio,
 
