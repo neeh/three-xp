@@ -492,24 +492,30 @@ function WebGLRenderer( parameters ) {
     }
 
     // Buffer rendering
-	this.renderBufferDirect = function ( camera, geometry, material, object, group ) {
+    this.renderBufferDirect = function (camera, geometry, material, object, group) {
+        state.setMaterial(material);
 
-		state.setMaterial( material );
+        /* NEW
+        var materialState = material.state;
+        if (materialState.hash !== _currentStateHash) {
+            state.setState(materialState);
+            _currentStateHash = materialState.hash;
+        }
+        */
 
-		var program = setProgram( camera, material, object );
-		var geometryProgram = geometry.id + '_' + program.id + '_' + ( material.wireframe === true );
+        var program = setProgram(camera, material, object);
+        var geometryProgram = geometry.id + '_' + program.id + '_' + (material.wireframe === true);
 
-		var updateBuffers = false;
+        var updateBuffers = false;
 
-		if ( geometryProgram !== _currentGeometryProgram ) {
-
-			_currentGeometryProgram = geometryProgram;
-			updateBuffers = true;
-
-		}
+        if (geometryProgram !== _currentGeometryProgram) {
+            _currentGeometryProgram = geometryProgram;
+            updateBuffers = true;
+        }
 
 		// morph targets
 
+        /*
 		var morphTargetInfluences = object.morphTargetInfluences;
 
 		if ( morphTargetInfluences !== undefined ) {
@@ -567,6 +573,7 @@ function WebGLRenderer( parameters ) {
 			updateBuffers = true;
 
 		}
+        */
 
 		//
 
@@ -999,7 +1006,7 @@ function WebGLRenderer( parameters ) {
 
     function renderObject(object, camera, geometry, material, group) {
         object.modelViewMatrix.multiplyMatrices(camera.matrixWorldInverse, object.matrixWorld);
-        object.normalMatrix.getNormalMatrix(object.modelViewMatrix);
+        object.normalMatrix.getNormalMatrix(object.modelViewMatrix); // TODO: Only if needed...
 
         _this.renderBufferDirect(camera, geometry, material, object, group);
     }
@@ -1088,6 +1095,47 @@ function WebGLRenderer( parameters ) {
         var uniformsList = WebGLUniforms.seqWithValue(progUniforms.seq, uniforms);
 
         materialProperties.uniformsList = uniformsList;
+    }
+
+    var _lastShader = null;
+    var _lastState = null;
+    var _lastUniforms = {};
+
+    function setMaterial(material, camera, object) {
+        _usedTextureUnits = 0;
+
+        var shader = material.shader;
+        if (material.shader !== _lastShader) {
+            setShader(material.shader);
+        }
+
+        if (material.state !== _lastState) {
+            setState();
+        }
+
+        var program = material.program;
+
+
+    }
+
+    function setShader(shader) {
+        if (shader.glVersion !== _glVersion) {
+            initShader(shader);
+        }
+
+        var program = shader.program;
+        if (program.id !== _currentProgram) {
+            _gl.useProgram(program.program);
+            _currentProgram = program.id;
+        }
+    }
+
+    function setState(force) {
+        if (force) {
+
+        } else {
+
+        }
     }
 
     function setProgram(camera, material, object) {
