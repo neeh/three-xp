@@ -30,15 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
  * @return {Number[9]} A 3x3 matrix.
  */
 function Mtx3(a, b, c,
-    d, e, f,
-    g, h, i) {
-        var m3 = new Float32Array(9);
+              d, e, f,
+              g, h, i) {
+    var m3 = new Float32Array(9);
 
-        m3[0] = a; m3[1] = b; m3[2] = c;
-        m3[3] = d; m3[4] = e; m3[5] = f;
-        m3[6] = g; m3[7] = h; m3[8] = i;
+    m3[0] = a; m3[1] = b; m3[2] = c;
+    m3[3] = d; m3[4] = e; m3[5] = f;
+    m3[6] = g; m3[7] = h; m3[8] = i;
 
-        return m3;
+    return m3;
 }
 
 /**
@@ -214,17 +214,17 @@ function Mtx3Cat(out, A, B) {
 function Mtx3Print(m3, a) {
     if (a === undefined) a = 2;
 
-    console.log( 'MTX3(' +
+    console.log('mtx3(' +
         m3[0].toFixed(a) + ', ' +
         m3[1].toFixed(a) + ', ' +
         m3[2].toFixed(a) + ','
     );
-    console.log( '     ' +
+    console.log('     ' +
         m3[3].toFixed(a) + ', ' +
         m3[4].toFixed(a) + ', ' +
         m3[5].toFixed(a) + ','
     );
-    console.log( '     ' +
+    console.log('     ' +
         m3[6].toFixed(a) + ', ' +
         m3[7].toFixed(a) + ', ' +
         m3[8].toFixed(a) + ')'
