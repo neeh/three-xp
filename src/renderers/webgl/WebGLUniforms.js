@@ -162,11 +162,19 @@ function setValue3fm(gl, v) {
     }
 }
 
+function Mtx4Cpy(dest, src) {
+    dest[ 0] = src[ 0]; dest[ 1] = src[ 1]; dest[ 2] = src[ 2]; dest[ 3] = src[ 3];
+    dest[ 4] = src[ 4]; dest[ 5] = src[ 5]; dest[ 6] = src[ 6]; dest[ 7] = src[ 7];
+    dest[ 8] = src[ 8]; dest[ 9] = src[ 9]; dest[10] = src[10]; dest[11] = src[11];
+    dest[12] = src[12]; dest[13] = src[13]; dest[14] = src[14]; dest[15] = src[15];
+}
+
 function setValue4fm(gl, v) {
     if (v.elements === undefined) {
         gl.uniformMatrix4fv(this.addr, false, v);
     } else {
-        mat4array.set(v.elements); // Why?
+        Mtx4Cpy(mat4array, v.elements);
+        // mat4array.set(v.elements); // Why?
         gl.uniformMatrix4fv(this.addr, false, mat4array);
     }
 }
@@ -246,6 +254,42 @@ function setValueT1a(gl, v, renderer) {
     }
 }
 
+// function setValueT1a(gl, v) {
+//     for (var i = 0, il = v.length; i < il; i++) {
+//         if (v[i] !== t1a[i]) {
+//             gl.uniform1iv(this.addr, v);
+//             for (; i < il; i++) {
+//                 t1a[i] = v[i];
+//             }
+//             return;
+//         }
+//     }
+// }
+//
+// NOTE: The initial active texture slot is 0
+// see https://www.khronos.org/webgl/wiki/Reference:activeTexture
+// function setValueTexs(gl, textures, renderer) {
+//     for (var i = 0, il = textures.length; i < il; i++) {
+//         var texture = textures[i];
+//         if (texture.properties.slot !== null) {
+//             _slots[i] = texture.__infos.slot;
+//         } else {
+//             texture.properties.slot = currentTextureSlot;
+//             currentSlots[i].properties.slot = null;
+//             currentSlots[i] = texture;
+//
+//             _slots[i] = currentTextureSlot;
+//             renderer.setTexture(texture, currentTextureSlot);
+//
+//             currentTextureSlot++;
+//             if (currentTextureSlot > maxTextures) {
+//                 currentTextureSlot = 0;
+//             }
+//         }
+//     }
+//     setValueT1a(this.addr, _slots);
+// }
+
 // Helper to pick the right setter for a pure (bottom-level) array
 function getPureArraySetter(type) {
     switch (type) {
@@ -273,6 +317,8 @@ function SingleUniform(id, activeInfo, addr) {
     this.id = id;
     this.addr = addr;
     this.setValue = getSingularSetter(activeInfo.type);
+    // this.cachedValue
+    // Not sure the value should be cached here...
     // this.path = activeInfo.name; // DEBUG
 }
 
@@ -281,6 +327,8 @@ function PureArrayUniform(id, activeInfo, addr) {
     this.addr = addr;
     this.size = activeInfo.size;
     this.setValue = getPureArraySetter(activeInfo.type);
+    // this.cachedValue
+    // Not sure the value should be cached here...
     // this.path = activeInfo.name; // DEBUG
 }
 
@@ -318,7 +366,7 @@ function addUniform(container, uniformObject) {
 }
 
 function parseUniform(activeInfo, addr, container) {
-    var path = activeInfo.name,
+    var path = activeInfo.name;
     var pathLength = path.length;
 
     // reset RegExp object, because of the early exit of a previous run
@@ -384,7 +432,7 @@ WebGLUniforms.prototype.setOptional = function (gl, object, name) {
 
 // Static interface
 WebGLUniforms.upload = function (gl, seq, values, renderer) {
-    for (var i = 0, il = seq.length; i < n; i++) {
+    for (var i = 0, il = seq.length; i < il; i++) {
         var u = seq[i];
         var v = values[u.id];
 
