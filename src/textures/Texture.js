@@ -18,6 +18,11 @@ function Texture( image, mapping, wrapS, wrapT, magFilter, minFilter, format, ty
 
 	this.uuid = _Math.generateUUID();
 
+    this.properties = {
+        slot:           null,
+        __webglTexture: null
+    };
+
 	this.name = '';
 
 	this.image = image !== undefined ? image : Texture.DEFAULT_IMAGE;
