@@ -49,6 +49,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 1 time in WebGLRenderer
 	identity: function () {
 
 		this.set(
@@ -64,12 +65,15 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 1 time in StereoCamera, 1 time in UniformsUtils
 	clone: function () {
 
 		return new Matrix4().fromArray( this.elements );
 
 	},
 
+	// USED
+	// 2 times in Camera, 4 times in StereoCamera, 3 times in SceneNode, 1 time in Skeleton, 1 time in SkinnedMesh, 1 in WebGLRenderer
 	copy: function ( m ) {
 
 		var te = this.elements;
@@ -84,6 +88,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// UNUSED
 	copyPosition: function ( m ) {
 
 		var te = this.elements, me = m.elements;
@@ -96,6 +101,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// UNUSED
 	extractBasis: function ( xAxis, yAxis, zAxis ) {
 
 		xAxis.setFromMatrixColumn( this, 0 );
@@ -106,6 +112,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// UNUSED
 	makeBasis: function ( xAxis, yAxis, zAxis ) {
 
 		this.set(
@@ -119,6 +126,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 1 time (WebGLRenderer)
 	extractRotation: function () {
 
 		var v1 = new Vector3();
@@ -150,6 +158,7 @@ Object.assign( Matrix4.prototype, {
 
 	}(),
 
+	// UNUSED
 	makeRotationFromEuler: function ( euler ) {
 
 		if ( ( euler && euler.isEuler ) === false ) {
@@ -278,6 +287,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 1 time in Euler
 	makeRotationFromQuaternion: function ( q ) {
 
 		var te = this.elements;
@@ -315,6 +325,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 2 times in SceneNode
 	lookAt: function () {
 
 		var x = new Vector3();
@@ -373,6 +384,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 1 time in WebGLRenderer
 	premultiply: function ( m ) {
 
 		return this.multiplyMatrices( m, this );
@@ -419,6 +431,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// UNUSED
 	multiplyScalar: function ( s ) {
 
 		var te = this.elements;
@@ -432,6 +445,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 2 times in BufferGeometry
 	applyToBufferAttribute: function () {
 
 		var v1 = new Vector3();
@@ -456,6 +470,7 @@ Object.assign( Matrix4.prototype, {
 
 	}(),
 
+	// UNUSED
 	determinant: function () {
 
 		var te = this.elements;
@@ -506,6 +521,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// UNUSED
 	transpose: function () {
 
 		var te = this.elements;
@@ -523,6 +539,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// UNUSED
 	setPosition: function ( v ) {
 
 		var te = this.elements;
@@ -535,6 +552,7 @@ Object.assign( Matrix4.prototype, {
 
 	},
 
+	// USED 2 times in Vector3, 1 time in Mesh, 1 time in Points, 3 times in Skeleton, 3 times in SkinnedMesh, 1 time in WebGLRenderer
 	getInverse: function ( m, throwOnDegenerate ) {
 
 		// based on http://www.euclideanspace.com/maths/algebra/matrix/functions/inverse/fourD/index.htm
