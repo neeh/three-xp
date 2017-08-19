@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 
 /** @temp */
-var Matrix4 = {};
+var Mtx4_ = {};
 
 /**
  * Creates a 4x4 matrix from components.
@@ -69,6 +69,16 @@ function Mtx4Ident() {
     return m4;
 }
 
+function Mtx4Set(m4, a, b, c, d,
+                     e, f, g, h,
+                     i, j, k, l,
+                     m, n, o, p) {
+    m4[ 0] = a; m4[ 1] = b; m4[ 2] = c; m4[ 3] = d;
+    m4[ 4] = e; m4[ 5] = f; m4[ 6] = g; m4[ 7] = h;
+    m4[ 8] = i; m4[ 9] = j; m4[10] = k; m4[11] = l;
+    m4[12] = m; m4[13] = n; m4[14] = o; m4[15] = p;
+}
+
 /**
  * Resets the components of a 4x4 matrix to the identity.
  * @param {Number[16]} m4 The 4x4 matrix to reset.
@@ -90,6 +100,13 @@ function Mtx4Cpy(dest, src) {
     dest[ 4] = src[ 4]; dest[ 5] = src[ 5]; dest[ 6] = src[ 6]; dest[ 7] = src[ 7];
     dest[ 8] = src[ 8]; dest[ 9] = src[ 9]; dest[10] = src[10]; dest[11] = src[11];
     dest[12] = src[12]; dest[13] = src[13]; dest[14] = src[14]; dest[15] = src[15];
+}
+
+function Mtx4MakeBasis(m4, xAxis, yAxis, zAxis) {
+    m4[ 0] = xAxis[0]; m4[ 1] = xAxis[1]; m4[ 2] = xAxis[ 2]; m4[ 3] = 0.0;
+    m4[ 4] = yAxis[0]; m4[ 5] = yAxis[1]; m4[ 6] = yAxis[ 2]; m4[ 7] = 0.0;
+    m4[ 8] = zAxis[0]; m4[ 9] = zAxis[1]; m4[10] = zAxis[ 2]; m4[11] = 0.0;
+    m4[12] = 0.0;      m4[13] = 0.0;      m4[14] = 0.0;       m4[15] = 1.0;
 }
 
 /**
@@ -134,7 +151,7 @@ function Mtx4FromMtx3(m4, m3) {
  * @param {Number[16]} B The second 4x4 matrix operand.
  * @return {Boolean} true if A = B.
  */
-function Mtx4Cmp(A, B) {
+function Mtx4Equals(A, B) {
     return A[ 0] === B[ 0] && A[ 1] === B[ 1] && A[ 2] === B[ 2] && A[ 3] === B[ 3] &&
            A[ 4] === B[ 4] && A[ 5] === B[ 5] && A[ 6] === B[ 6] && A[ 7] === B[ 7] &&
            A[ 8] === B[ 8] && A[ 9] === B[ 9] && A[10] === B[10] && A[11] === B[11] &&
@@ -194,7 +211,7 @@ function Mtx4Invert(m4) {
  * Inverts a matrix.
  * @param {Number[16]} m4 The in-out matrix.
  */
-Matrix4.invert = function ( m4 )
+Mtx4_.invert = function ( m4 )
 {
     var a = m4[ 0], b = m4[ 1], c = m4[ 2], d = m4[ 3],
         e = m4[ 4], f = m4[ 5], g = m4[ 6], h = m4[ 7],
@@ -728,7 +745,7 @@ function Mtx4MakeLookAt(m4, eye, target, up) {
  * @param {Number[3]} target Position of the target.
  * @param {Number[3]} up Direction of the up vector.
  */
-Matrix4.lookAt = function ( m4, eye, target, up )
+Mtx4_.lookAt = function ( m4, eye, target, up )
 {
     var ex = eye[0], tx = target[0], ux = up[0],
         ey = eye[1], ty = target[1], uy = up[1],
