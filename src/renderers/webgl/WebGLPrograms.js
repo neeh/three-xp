@@ -1,13 +1,9 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
 
 import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
 import { WebGLProgram } from './WebGLProgram';
 
-function WebGLPrograms( renderer, capabilities ) {
-
-	var programs = [];
+function WebGLPrograms(renderer, capabilities) {
+    var programs = [];
 
     /*
 	var parameterNames = [
@@ -236,37 +232,28 @@ function WebGLPrograms( renderer, capabilities ) {
 		return array.join();
 
 	};
+    this.acquireProgram = function (material, code) {
+        var program;
 
-	this.acquireProgram = function ( material, code ) {
+        // Check if code has been already compiled
+        for (var p = 0, pl = programs.length; p < pl; p++) {
+            var programInfo = programs[p];
 
-		var program;
+            if (programInfo.code === code) {
+                program = programInfo;
+                program.usedTimes++;
 
-		// Check if code has been already compiled
-		for ( var p = 0, pl = programs.length; p < pl; p ++ ) {
+                break;
+            }
+        }
 
-			var programInfo = programs[ p ];
+        if (program === undefined) {
+            program = new WebGLProgram(renderer, code, material/*, parameters */);
+            programs.push(program);
+        }
 
-			if ( programInfo.code === code ) {
-
-				program = programInfo;
-				++ program.usedTimes;
-
-				break;
-
-			}
-
-		}
-
-		if ( program === undefined ) {
-
-			program = new WebGLProgram( renderer, code, material, /* parameters */ );
-			programs.push( program );
-
-		}
-
-		return program;
-
-	};
+        return program;
+    };
 
 	this.releaseProgram = function ( program ) {
 
