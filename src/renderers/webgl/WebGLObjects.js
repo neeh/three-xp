@@ -1,52 +1,36 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
 
-function WebGLObjects( gl, geometries, infoRender ) {
+function WebGLObjects(gl, geometries, infoRender) {
+    var updateList = {};
 
-	var updateList = {};
+    function update(object) {
+        var frame = infoRender.frame;
 
-	function update( object ) {
+        var geometry = object.geometry;
+        var buffergeometry = geometries.get(object, geometry);
 
-		var frame = infoRender.frame;
-
-		var geometry = object.geometry;
-		var buffergeometry = geometries.get( object, geometry );
-
-		// Update once per frame
-
-		if ( updateList[ buffergeometry.id ] !== frame ) {
-
+        // Update once per frame
+        if (updateList[buffergeometry.id] !== frame) {
             /*
-			if ( geometry.isGeometry ) {
-				buffergeometry.updateFromObject( object );
-			}
+            if (geometry.isGeometry) {
+                buffergeometry.updateFromObject(object);
+            }
             */
 
-			geometries.update( buffergeometry );
+            geometries.update(buffergeometry);
+            updateList[buffergeometry.id] = frame;
+        }
 
-			updateList[ buffergeometry.id ] = frame;
+        return buffergeometry;
+    }
 
-		}
+    function clear() {
+        updateList = {};
+    }
 
-		return buffergeometry;
-
-	}
-
-	function clear() {
-
-		updateList = {};
-
-	}
-
-	return {
-
-		update: update,
-		clear: clear
-
-	};
-
+    return {
+        update: update,
+        clear: clear
+    };
 }
-
 
 export { WebGLObjects };
