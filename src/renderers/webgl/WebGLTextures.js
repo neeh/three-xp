@@ -1,283 +1,191 @@
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
 import { LinearFilter, NearestFilter, RGBFormat, RGBAFormat, DepthFormat, DepthStencilFormat, UnsignedShortType, UnsignedIntType, UnsignedInt248Type, FloatType, HalfFloatType, ClampToEdgeWrapping, NearestMipMapLinearFilter, NearestMipMapNearestFilter } from '../../constants';
 import { _Math } from '../../math/Math';
 
-function WebGLTextures( _gl, extensions, state, properties, capabilities, paramThreeToGL, infoMemory ) {
-
-	var _isWebGL2 = ( typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext );
-
-	//
-
-	function clampToMaxSize( image, maxSize ) {
-
-		if ( image.width > maxSize || image.height > maxSize ) {
-
-			// Warning: Scaling through the canvas will only work with images that use
-			// premultiplied alpha.
-
-			var scale = maxSize / Math.max( image.width, image.height );
-
-			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-			canvas.width = Math.floor( image.width * scale );
-			canvas.height = Math.floor( image.height * scale );
-
-			var context = canvas.getContext( '2d' );
-			context.drawImage( image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height );
-
-			console.warn( 'THREE.WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
-
-			return canvas;
-
-		}
-
-		return image;
-
-	}
-
-	function isPowerOfTwo( image ) {
-
-		return _Math.isPowerOfTwo( image.width ) && _Math.isPowerOfTwo( image.height );
-
-	}
-
-	function makePowerOfTwo( image ) {
-
-		if ( image instanceof HTMLImageElement || image instanceof HTMLCanvasElement ) {
-
-			var canvas = document.createElementNS( 'http://www.w3.org/1999/xhtml', 'canvas' );
-			canvas.width = _Math.nearestPowerOfTwo( image.width );
-			canvas.height = _Math.nearestPowerOfTwo( image.height );
-
-			var context = canvas.getContext( '2d' );
-			context.drawImage( image, 0, 0, canvas.width, canvas.height );
-
-			console.warn( 'THREE.WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image );
-
-			return canvas;
-
-		}
-
-		return image;
-
-	}
-
-	function textureNeedsPowerOfTwo( texture ) {
-
-		return ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) ||
-			( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter );
-
-	}
-
-	// Fallback filters for non-power-of-2 textures
-
-	function filterFallback( f ) {
-
-		if ( f === NearestFilter || f === NearestMipMapNearestFilter || f === NearestMipMapLinearFilter ) {
-
-			return _gl.NEAREST;
-
-		}
-
-		return _gl.LINEAR;
-
-	}
-
-	//
-
-	function onTextureDispose( event ) {
-
-		var texture = event.target;
-
-		texture.removeEventListener( 'dispose', onTextureDispose );
-
-		deallocateTexture( texture );
-
-		infoMemory.textures --;
-
-
-	}
-
-	function onRenderTargetDispose( event ) {
-
-		var renderTarget = event.target;
-
-		renderTarget.removeEventListener( 'dispose', onRenderTargetDispose );
-
-		deallocateRenderTarget( renderTarget );
-
-		infoMemory.textures --;
-
-	}
-
-	//
-
-	function deallocateTexture( texture ) {
-
-		var textureProperties = properties.get( texture );
-
-		if ( texture.image && textureProperties.__image__webglTextureCube ) {
-
-			// cube texture
-
-			_gl.deleteTexture( textureProperties.__image__webglTextureCube );
-
-		} else {
-
-			// 2D texture
-
-			if ( textureProperties.__webglInit === undefined ) return;
-
-			_gl.deleteTexture( textureProperties.__webglTexture );
-
-		}
-
-		// remove all webgl properties
-		properties.remove( texture );
-
-	}
-
-	function deallocateRenderTarget( renderTarget ) {
-
-		var renderTargetProperties = properties.get( renderTarget );
-		var textureProperties = properties.get( renderTarget.texture );
-
-		if ( ! renderTarget ) return;
-
-		if ( textureProperties.__webglTexture !== undefined ) {
-
-			_gl.deleteTexture( textureProperties.__webglTexture );
-
-		}
-
-		if ( renderTarget.depthTexture ) {
-
-			renderTarget.depthTexture.dispose();
-
-		}
-
-		if ( renderTarget.isWebGLRenderTargetCube ) {
-
-			for ( var i = 0; i < 6; i ++ ) {
-
-				_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer[ i ] );
-				if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer[ i ] );
-
-			}
-
-		} else {
-
-			_gl.deleteFramebuffer( renderTargetProperties.__webglFramebuffer );
-			if ( renderTargetProperties.__webglDepthbuffer ) _gl.deleteRenderbuffer( renderTargetProperties.__webglDepthbuffer );
-
-		}
-
-		properties.remove( renderTarget.texture );
-		properties.remove( renderTarget );
-
-	}
-
-	//
-
-
-
-	function setTexture2D( texture, slot ) {
-
-		var textureProperties = properties.get( texture );
-
-		if ( texture.version > 0 && textureProperties.__version !== texture.version ) {
-
-			var image = texture.image;
-
-			if ( image === undefined ) {
-
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is undefined', texture );
-
-			} else if ( image.complete === false ) {
-
-				console.warn( 'THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture );
-
-			} else {
-
-				uploadTexture( textureProperties, texture, slot );
-				return;
-
-			}
-
-		}
-
-		state.activeTexture( _gl.TEXTURE0 + slot );
-		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
-
-	}
-
-	function setTextureParameters( textureType, texture, isPowerOfTwoImage ) {
-
-		var extension;
-
-		if ( isPowerOfTwoImage ) {
-
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL( texture.wrapS ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL( texture.wrapT ) );
-
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL( texture.minFilter ) );
-
-		} else {
-
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE );
-			_gl.texParameteri( textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE );
-
-			if ( texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping ) {
-
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to THREE.ClampToEdgeWrapping.', texture );
-
-			}
-
-			_gl.texParameteri( textureType, _gl.TEXTURE_MAG_FILTER, filterFallback( texture.magFilter ) );
-			_gl.texParameteri( textureType, _gl.TEXTURE_MIN_FILTER, filterFallback( texture.minFilter ) );
-
-			if ( texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter ) {
-
-				console.warn( 'THREE.WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to THREE.NearestFilter or THREE.LinearFilter.', texture );
-
-			}
-
-		}
-
-		extension = extensions.get( 'EXT_texture_filter_anisotropic' );
-
-		if ( extension ) {
-
-			if ( texture.type === FloatType && extensions.get( 'OES_texture_float_linear' ) === null ) return;
-			if ( texture.type === HalfFloatType && extensions.get( 'OES_texture_half_float_linear' ) === null ) return;
-
-			if ( texture.anisotropy > 1 || properties.get( texture ).__currentAnisotropy ) {
-
-				_gl.texParameterf( textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min( texture.anisotropy, capabilities.getMaxAnisotropy() ) );
-				properties.get( texture ).__currentAnisotropy = texture.anisotropy;
-
-			}
-
-		}
-
-	}
-
-	function uploadTexture( textureProperties, texture, slot ) {
-
-		if ( textureProperties.__webglInit === undefined ) {
-
-			textureProperties.__webglInit = true;
-
-			texture.addEventListener( 'dispose', onTextureDispose );
-
-			textureProperties.__webglTexture = _gl.createTexture();
-
-			infoMemory.textures ++;
-
-		}
+function WebGLTextures(_gl, extensions, state, properties, capabilities, paramThreeToGL, infoMemory) {
+    var _isWebGL2 = (typeof WebGL2RenderingContext !== 'undefined' && _gl instanceof WebGL2RenderingContext);
+
+    function clampToMaxSize(image, maxSize) {
+        if (image.width > maxSize || image.height > maxSize) {
+            // Warning: Scaling through the canvas will only work with images that use
+            // premultiplied alpha.
+
+            var scale = maxSize / Math.max(image.width, image.height);
+
+            var canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+            canvas.width = Math.floor(image.width * scale);
+            canvas.height = Math.floor(image.height * scale);
+
+            var context = canvas.getContext('2d');
+            context.drawImage(image, 0, 0, image.width, image.height, 0, 0, canvas.width, canvas.height);
+
+            console.warn('WebGLRenderer: image is too big (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image);
+
+            return canvas;
+        }
+
+        return image;
+    }
+
+    function isPowerOfTwo(image) {
+        return _Math.isPowerOfTwo(image.width) && _Math.isPowerOfTwo(image.height);
+    }
+
+    function makePowerOfTwo(image) {
+        if (image instanceof HTMLImageElement || image instanceof HTMLCanvasElement) {
+            var canvas = document.createElementNS('http://www.w3.org/1999/xhtml', 'canvas');
+            canvas.width = _Math.nearestPowerOfTwo(image.width);
+            canvas.height = _Math.nearestPowerOfTwo(image.height);
+
+            var context = canvas.getContext('2d');
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+            console.warn('WebGLRenderer: image is not power of two (' + image.width + 'x' + image.height + '). Resized to ' + canvas.width + 'x' + canvas.height, image);
+            return canvas;
+        }
+        return image;
+    }
+
+    function textureNeedsPowerOfTwo(texture) {
+        return (texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping) ||
+            (texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter);
+    }
+
+    // Fallback filters for non-power-of-2 textures
+    function filterFallback(f) {
+        if (f === NearestFilter || f === NearestMipMapNearestFilter || f === NearestMipMapLinearFilter) {
+            return _gl.NEAREST;
+        }
+        return _gl.LINEAR;
+    }
+
+    //
+
+    function onTextureDispose(event) {
+        var texture = event.target;
+        texture.removeEventListener('dispose', onTextureDispose);
+        deallocateTexture(texture);
+        infoMemory.textures --;
+    }
+
+    function onRenderTargetDispose(event) {
+        var renderTarget = event.target;
+        renderTarget.removeEventListener('dispose', onRenderTargetDispose);
+        deallocateRenderTarget(renderTarget);
+        infoMemory.textures --;
+    }
+
+    //
+
+    function deallocateTexture(texture) {
+        var textureProperties = properties.get(texture);
+
+        if (texture.image && textureProperties.__image__webglTextureCube) {
+            // cube texture
+            _gl.deleteTexture(textureProperties.__image__webglTextureCube);
+        } else {
+            // 2D texture
+            if (textureProperties.__webglInit === undefined) return;
+            _gl.deleteTexture(textureProperties.__webglTexture);
+        }
+
+        // remove all webgl properties
+        properties.remove(texture);
+    }
+
+    function deallocateRenderTarget(renderTarget) {
+        var renderTargetProperties = properties.get(renderTarget);
+        var textureProperties = properties.get(renderTarget.texture);
+
+        if (!renderTarget) return;
+
+        if (textureProperties.__webglTexture !== undefined) {
+            _gl.deleteTexture(textureProperties.__webglTexture);
+        }
+
+        if (renderTarget.depthTexture) {
+            renderTarget.depthTexture.dispose();
+        }
+
+        if (renderTarget.isWebGLRenderTargetCube) {
+            for (var i = 0; i < 6; i++) {
+                _gl.deleteFramebuffer(renderTargetProperties.__webglFramebuffer[i]);
+                if (renderTargetProperties.__webglDepthbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglDepthbuffer[i]);
+            }
+        } else {
+            _gl.deleteFramebuffer(renderTargetProperties.__webglFramebuffer);
+            if (renderTargetProperties.__webglDepthbuffer) _gl.deleteRenderbuffer(renderTargetProperties.__webglDepthbuffer);
+        }
+
+        properties.remove(renderTarget.texture);
+        properties.remove(renderTarget);
+    }
+
+    //
+
+    function setTexture2D(texture, slot) {
+        var textureProperties = properties.get(texture);
+
+        if (texture.version > 0 && textureProperties.__version !== texture.version) {
+            var image = texture.image;
+            if (image === undefined) {
+                console.warn('WebGLRenderer: Texture marked for update but image is undefined', texture);
+            } else if (image.complete === false) {
+                console.warn('THREE.WebGLRenderer: Texture marked for update but image is incomplete', texture);
+            } else {
+                uploadTexture(textureProperties, texture, slot);
+                return;
+            }
+        }
+
+        state.activeTexture(_gl.TEXTURE0 + slot);
+        state.bindTexture(_gl.TEXTURE_2D, textureProperties.__webglTexture);
+    }
+
+    function setTextureParameters(textureType, texture, isPowerOfTwoImage) {
+        var extension;
+
+        if (isPowerOfTwoImage) {
+            _gl.texParameteri(textureType, _gl.TEXTURE_WRAP_S, paramThreeToGL(texture.wrapS));
+            _gl.texParameteri(textureType, _gl.TEXTURE_WRAP_T, paramThreeToGL(texture.wrapT));
+
+            _gl.texParameteri(textureType, _gl.TEXTURE_MAG_FILTER, paramThreeToGL(texture.magFilter));
+            _gl.texParameteri(textureType, _gl.TEXTURE_MIN_FILTER, paramThreeToGL(texture.minFilter));
+        } else {
+            _gl.texParameteri(textureType, _gl.TEXTURE_WRAP_S, _gl.CLAMP_TO_EDGE);
+            _gl.texParameteri(textureType, _gl.TEXTURE_WRAP_T, _gl.CLAMP_TO_EDGE);
+
+            if (texture.wrapS !== ClampToEdgeWrapping || texture.wrapT !== ClampToEdgeWrapping) {
+                console.warn('WebGLRenderer: Texture is not power of two. Texture.wrapS and Texture.wrapT should be set to ClampToEdgeWrapping.', texture);
+            }
+
+            _gl.texParameteri(textureType, _gl.TEXTURE_MAG_FILTER, filterFallback(texture.magFilter));
+            _gl.texParameteri(textureType, _gl.TEXTURE_MIN_FILTER, filterFallback(texture.minFilter));
+
+            if (texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter) {
+                console.warn('WebGLRenderer: Texture is not power of two. Texture.minFilter should be set to NearestFilter or LinearFilter.', texture);
+            }
+        }
+
+        extension = extensions.get('EXT_texture_filter_anisotropic');
+
+        if (extension) {
+            if (texture.type === FloatType && extensions.get('OES_texture_float_linear') === null) return;
+            if (texture.type === HalfFloatType && extensions.get('OES_texture_half_float_linear') === null) return;
+
+            if (texture.anisotropy > 1 || properties.get(texture).__currentAnisotropy) {
+                _gl.texParameterf(textureType, extension.TEXTURE_MAX_ANISOTROPY_EXT, Math.min(texture.anisotropy, capabilities.getMaxAnisotropy()));
+                properties.get(texture).__currentAnisotropy = texture.anisotropy;
+            }
+        }
+    }
+
+    function uploadTexture(textureProperties, texture, slot) {
+        if (textureProperties.__webglInit === undefined) {
+            textureProperties.__webglInit = true;
+            texture.addEventListener('dispose', onTextureDispose);
+            textureProperties.__webglTexture = _gl.createTexture();
+            infoMemory.textures ++;
+        }
 
 		state.activeTexture( _gl.TEXTURE0 + slot );
 		state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
@@ -407,39 +315,27 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 			}
 
-		} else {
+        } else {
+            // regular Texture (image, video, canvas)
 
-			// regular Texture (image, video, canvas)
+            // use manually created mipmaps if available
+            // if there are no manual mipmaps
+            // set 0 level mipmap and then use GL to generate other mipmap levels
 
-			// use manually created mipmaps if available
-			// if there are no manual mipmaps
-			// set 0 level mipmap and then use GL to generate other mipmap levels
+            if (mipmaps.length > 0 && isPowerOfTwoImage) {
+                for (var i = 0, il = mipmaps.length; i < il; i++) {
+                    mipmap = mipmaps[i];
+                    state.texImage2D(_gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap);
+                }
+                texture.generateMipmaps = false;
+            } else {
+                state.texImage2D(_gl.TEXTURE_2D, 0, glFormat, glFormat, glType, image);
+            }
+        }
 
-			if ( mipmaps.length > 0 && isPowerOfTwoImage ) {
-
-				for ( var i = 0, il = mipmaps.length; i < il; i ++ ) {
-
-					mipmap = mipmaps[ i ];
-					state.texImage2D( _gl.TEXTURE_2D, i, glFormat, glFormat, glType, mipmap );
-
-				}
-
-				texture.generateMipmaps = false;
-
-			} else {
-
-				state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, glFormat, glType, image );
-
-			}
-
-		}
-
-		if ( texture.generateMipmaps && isPowerOfTwoImage ) _gl.generateMipmap( _gl.TEXTURE_2D );
-
-		textureProperties.__version = texture.version;
-
-		if ( texture.onUpdate ) texture.onUpdate( texture );
-
+        if (texture.generateMipmaps && isPowerOfTwoImage) _gl.generateMipmap(_gl.TEXTURE_2D);
+        textureProperties.__version = texture.version;
+        if (texture.onUpdate) texture.onUpdate(texture);
 	}
 
 	// Render targets
@@ -636,29 +532,22 @@ function WebGLTextures( _gl, extensions, state, properties, capabilities, paramT
 
 	}
 
-	function updateRenderTargetMipmap( renderTarget ) {
+    function updateRenderTargetMipmap(renderTarget) {
+        var texture = renderTarget.texture;
 
-		var texture = renderTarget.texture;
+        if (texture.generateMipmaps && isPowerOfTwo(renderTarget) && texture.minFilter !== NearestFilter && texture.minFilter !== LinearFilter) {
+            var target = (renderTarget && renderTarget.isWebGLRenderTargetCube) ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
+            var webglTexture = properties.get(texture).__webglTexture;
 
-		if ( texture.generateMipmaps && isPowerOfTwo( renderTarget ) &&
-				texture.minFilter !== NearestFilter &&
-				texture.minFilter !== LinearFilter ) {
+            state.bindTexture(target, webglTexture);
+            _gl.generateMipmap(target);
+            state.bindTexture(target, null);
+        }
+    }
 
-			var target = (renderTarget && renderTarget.isWebGLRenderTargetCube) ? _gl.TEXTURE_CUBE_MAP : _gl.TEXTURE_2D;
-			var webglTexture = properties.get( texture ).__webglTexture;
-
-			state.bindTexture( target, webglTexture );
-			_gl.generateMipmap( target );
-			state.bindTexture( target, null );
-
-		}
-
-	}
-
-	this.setTexture2D = setTexture2D;
-	this.setupRenderTarget = setupRenderTarget;
-	this.updateRenderTargetMipmap = updateRenderTargetMipmap;
-
+    this.setTexture2D = setTexture2D;
+    this.setupRenderTarget = setupRenderTarget;
+    this.updateRenderTargetMipmap = updateRenderTargetMipmap;
 }
 
 
