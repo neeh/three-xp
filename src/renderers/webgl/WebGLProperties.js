@@ -1,46 +1,32 @@
-/**
- * @author fordacious / fordacious.github.io
- */
 
 function WebGLProperties() {
+    var properties = {};
 
-	var properties = {};
+    function get(object) {
+        var uuid = object.uuid;
+        var map = properties[uuid];
 
-	function get( object ) {
+        if (map === undefined) {
+            map = {};
+            properties[uuid] = map;
+        }
 
-		var uuid = object.uuid;
-		var map = properties[ uuid ];
+        return map;
+    }
 
-		if ( map === undefined ) {
+    function remove(object) {
+        delete properties[object.uuid];
+    }
 
-			map = {};
-			properties[ uuid ] = map;
+    function clear() {
+        properties = {};
+    }
 
-		}
-
-		return map;
-
-	}
-
-	function remove( object ) {
-
-		delete properties[ object.uuid ];
-
-	}
-
-	function clear() {
-
-		properties = {};
-
-	}
-
-	return {
-		get: get,
-		remove: remove,
-		clear: clear
-	};
-
+    return {
+        get: get,
+        remove: remove,
+        clear: clear
+    };
 }
-
 
 export { WebGLProperties };
