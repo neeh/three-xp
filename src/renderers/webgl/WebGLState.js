@@ -757,76 +757,52 @@ function WebGLState( gl, extensions, paramThreeToGL ) {
 
 	}
 
-	// texture
+    // texture
 
-	function activeTexture( webglSlot ) {
+    function activeTexture(webglSlot) {
+        if (webglSlot === undefined) webglSlot = gl.TEXTURE0 + maxTextures - 1;
 
-		if ( webglSlot === undefined ) webglSlot = gl.TEXTURE0 + maxTextures - 1;
+        if (currentTextureSlot !== webglSlot) {
+            gl.activeTexture(webglSlot);
+            currentTextureSlot = webglSlot;
+        }
+    }
 
-		if ( currentTextureSlot !== webglSlot ) {
+    function bindTexture(webglType, webglTexture) {
+        if (currentTextureSlot === null) {
+            activeTexture();
+        }
 
-			gl.activeTexture( webglSlot );
-			currentTextureSlot = webglSlot;
+        var boundTexture = currentBoundTextures[currentTextureSlot];
 
-		}
+        if (boundTexture === undefined) {
+            boundTexture = { type: undefined, texture: undefined };
+            currentBoundTextures[currentTextureSlot] = boundTexture;
+        }
 
-	}
+        if (boundTexture.type !== webglType || boundTexture.texture !== webglTexture) {
+            gl.bindTexture(webglType, webglTexture || emptyTextures[webglType]);
 
-	function bindTexture( webglType, webglTexture ) {
+            boundTexture.type = webglType;
+            boundTexture.texture = webglTexture;
+        }
+    }
 
-		if ( currentTextureSlot === null ) {
+    function compressedTexImage2D() {
+        try {
+            gl.compressedTexImage2D.apply(gl, arguments);
+        } catch (error) {
+            console.error( error );
+        }
+    }
 
-			activeTexture();
-
-		}
-
-		var boundTexture = currentBoundTextures[ currentTextureSlot ];
-
-		if ( boundTexture === undefined ) {
-
-			boundTexture = { type: undefined, texture: undefined };
-			currentBoundTextures[ currentTextureSlot ] = boundTexture;
-
-		}
-
-		if ( boundTexture.type !== webglType || boundTexture.texture !== webglTexture ) {
-
-			gl.bindTexture( webglType, webglTexture || emptyTextures[ webglType ] );
-
-			boundTexture.type = webglType;
-			boundTexture.texture = webglTexture;
-
-		}
-
-	}
-
-	function compressedTexImage2D() {
-
-		try {
-
-			gl.compressedTexImage2D.apply( gl, arguments );
-
-		} catch ( error ) {
-
-			console.error( error );
-
-		}
-
-	}
-
-	function texImage2D() {
-
-		try {
-
-			gl.texImage2D.apply( gl, arguments );
-
-		} catch ( error ) {
-
-			console.error( error );
-
-		}
-
-	}
+    function texImage2D() {
+        try {
+            gl.texImage2D.apply(gl, arguments);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
 	//
 
