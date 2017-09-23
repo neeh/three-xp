@@ -1,11 +1,10 @@
-
-import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
+// import { BackSide, DoubleSide, FlatShading, CubeUVRefractionMapping, CubeUVReflectionMapping, GammaEncoding, LinearEncoding } from '../../constants';
 import { WebGLProgram } from './WebGLProgram';
 
 function WebGLPrograms(renderer, capabilities) {
-    var programs = [];
+  var programs = [];
 
-    /*
+  /*
 	var parameterNames = [
 		"precision", "supportsVertexTextures", "map", "mapEncoding", "envMap", "envMapMode", "envMapEncoding",
 		"lightMap", "aoMap", "emissiveMap", "emissiveMapEncoding", "bumpMap", "normalMap", "displacementMap", "specularMap",
@@ -18,46 +17,36 @@ function WebGLPrograms(renderer, capabilities) {
 		"shadowMapEnabled", "shadowMapType", "toneMapping", 'physicallyCorrectLights',
 		"alphaTest", "doubleSided", "flipSided", "numClippingPlanes", "numClipIntersection", "depthPacking", "dithering"
 	];
-    */
+  */
 
+  // function allocateBones(object) {
+  //   var skeleton = object.skeleton;
+  //   var bones = skeleton.bones;
+  //
+  //   if (capabilities.floatVertexTextures) {
+  //     return 1024;
+  //   } else {
+  //     // default for when object is not specified
+  //     // (for example when prebuilding shader to be used with multiple objects)
+  //     //  - leave some extra space for other uniforms
+  //     //  - limit here is ANGLE's 254 max uniform vectors
+  //     //    (up to 54 should be safe)
+  //
+  //     var nVertexUniforms = capabilities.maxVertexUniforms;
+  //     var nVertexMatrices = Math.floor((nVertexUniforms - 20) / 4);
+  //
+  //     var maxBones = Math.min(nVertexMatrices, bones.length);
+  //
+  //     if (maxBones < bones.length) {
+  //       console.warn('THREE.WebGLRenderer: Skeleton has ' + bones.length + ' bones. This GPU supports ' + maxBones + '.');
+  //       return 0;
+  //     }
+  //
+  //     return maxBones;
+  //   }
+  // }
 
-	function allocateBones( object ) {
-
-		var skeleton = object.skeleton;
-		var bones = skeleton.bones;
-
-		if ( capabilities.floatVertexTextures ) {
-
-			return 1024;
-
-		} else {
-
-			// default for when object is not specified
-			// ( for example when prebuilding shader to be used with multiple objects )
-			//
-			//  - leave some extra space for other uniforms
-			//  - limit here is ANGLE's 254 max uniform vectors
-			//    (up to 54 should be safe)
-
-			var nVertexUniforms = capabilities.maxVertexUniforms;
-			var nVertexMatrices = Math.floor( ( nVertexUniforms - 20 ) / 4 );
-
-			var maxBones = Math.min( nVertexMatrices, bones.length );
-
-			if ( maxBones < bones.length ) {
-
-				console.warn( 'THREE.WebGLRenderer: Skeleton has ' + bones.length + ' bones. This GPU supports ' + maxBones + '.' );
-				return 0;
-
-			}
-
-			return maxBones;
-
-		}
-
-	}
-
-    /*
+  /*
 	function getTextureEncodingFromMap( map, gammaOverrideLinear ) {
 
 		var encoding;
@@ -87,9 +76,9 @@ function WebGLPrograms(renderer, capabilities) {
 		return encoding;
 
 	}
-    */
+  */
 
-    /*
+  /*
 	this.getParameters = function ( material, lights, fog, nClipPlanes, nClipIntersection, object ) {
 
 		var shaderID = shaderIDs[ material.type ];
@@ -193,87 +182,69 @@ function WebGLPrograms(renderer, capabilities) {
 		return parameters;
 
 	};
-    */
+  */
 
-	this.getProgramCode = function ( material ) {
+  this.getProgramCode = function (material) {
+    var array = [];
 
-		var array = [];
+    // if (parameters.shaderID) {
+    // 	array.push(parameters.shaderID);
+    // } else {
+    array.push(material.fragmentShader);
+    array.push(material.vertexShader);
+    // }
 
-        /*
-		if ( parameters.shaderID ) {
+    if (material.defines !== undefined) {
+      for (var name in material.defines) {
+        array.push(name);
+        array.push(material.defines[name]);
+      }
+    }
 
-			array.push( parameters.shaderID );
+    // for (var i = 0; i < parameterNames.length; i++) {
+    //   array.push(parameters[parameterNames[i]]);
+    // }
 
-		} else {
-        */
+    return array.join();
+  };
 
-		array.push( material.fragmentShader );
-		array.push( material.vertexShader );
+  this.acquireProgram = function (material, code) {
+    var program;
 
-		// }
+    // Check if code has been already compiled
+    for (var p = 0, pl = programs.length; p < pl; p++) {
+      var programInfo = programs[p];
 
-		if ( material.defines !== undefined ) {
+      if (programInfo.code === code) {
+        program = programInfo;
+        program.usedTimes++;
 
-			for ( var name in material.defines ) {
+        break;
+      }
+    }
 
-				array.push( name );
-				array.push( material.defines[ name ] );
+    if (program === undefined) {
+      program = new WebGLProgram(renderer, code, material/*, parameters */);
+      programs.push(program);
+    }
 
-			}
+    return program;
+  };
 
-		}
+  this.releaseProgram = function (program) {
+    if (--program.usedTimes === 0) {
+      // Remove from unordered set
+      var i = programs.indexOf(program);
+      programs[i] = programs[programs.length - 1];
+      programs.pop();
 
-		// for ( var i = 0; i < parameterNames.length; i ++ ) {
-        //
-		// 	array.push( parameters[ parameterNames[ i ] ] );
-        //
-		// }
+      // Free WebGL resources
+      program.destroy();
+    }
+  };
 
-		return array.join();
-
-	};
-    this.acquireProgram = function (material, code) {
-        var program;
-
-        // Check if code has been already compiled
-        for (var p = 0, pl = programs.length; p < pl; p++) {
-            var programInfo = programs[p];
-
-            if (programInfo.code === code) {
-                program = programInfo;
-                program.usedTimes++;
-
-                break;
-            }
-        }
-
-        if (program === undefined) {
-            program = new WebGLProgram(renderer, code, material/*, parameters */);
-            programs.push(program);
-        }
-
-        return program;
-    };
-
-	this.releaseProgram = function ( program ) {
-
-		if ( -- program.usedTimes === 0 ) {
-
-			// Remove from unordered set
-			var i = programs.indexOf( program );
-			programs[ i ] = programs[ programs.length - 1 ];
-			programs.pop();
-
-			// Free WebGL resources
-			program.destroy();
-
-		}
-
-	};
-
-	// Exposed for resource monitoring & error feedback via renderer.info:
-	this.programs = programs;
-
+  // Exposed for resource monitoring & error feedback via renderer.info:
+  this.programs = programs;
 }
 
 

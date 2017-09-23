@@ -9,11 +9,6 @@ import { Matrix3 } from '../math/Matrix3';
 import { _Math } from '../math/Math';
 import { arrayMax } from '../utils';
 
-/**
- * @author alteredq / http://alteredqualia.com/
- * @author mrdoob / http://mrdoob.com/
- */
-
 var geometryId = 0;
 
 // WARNING: Attributes can be shared among geometries.

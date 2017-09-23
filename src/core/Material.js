@@ -13,10 +13,10 @@ function Material(parameters) {
     this.id = ++materialId;
 
     this.properties = {
-        program: null,
+        program:       null,
         __webglShader: null,
-        uniformsList: null,
-        glVersion: 0
+        uniformsList:  null,
+        glVersion:     0
     };
 
     this.blending = NormalBlending;
