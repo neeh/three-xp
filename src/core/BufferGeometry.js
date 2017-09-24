@@ -1,7 +1,7 @@
 import { Vector3 } from '../math/Vector3';
 import { Box3 } from '../math/Box3';
 import { EventDispatcher } from './EventDispatcher';
-import { BufferAttribute, Float32BufferAttribute, Uint16BufferAttribute, Uint32BufferAttribute } from './BufferAttribute';
+import { BufferAttribute } from './BufferAttribute';
 import { Sphere } from '../math/Sphere';
 import { SceneNode } from './SceneNode';
 import { Matrix4 } from '../math/Matrix4';
@@ -427,7 +427,7 @@ Object.assign(BufferGeometry.prototype, EventDispatcher.prototype, {
         var morphAttributes = source.morphAttributes;
         for (var name in morphAttributes) {
             var array = [];
-            var morphAttribute = morphAttributes[name]; // morphAttribute: array of Float32BufferAttributes
+            var morphAttribute = morphAttributes[name]; // morphAttribute: array of BufferAttributes (Float32)
 
             for (var i = 0, il = morphAttribute.length; i < il; i++) {
                 array.push(morphAttribute[i].clone());

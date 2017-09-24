@@ -1,4 +1,4 @@
-import { Uint16BufferAttribute, Uint32BufferAttribute } from '../../core/BufferAttribute';
+import { BufferAttribute } from '../../core/BufferAttribute';
 import { BufferGeometry } from '../../core/BufferGeometry';
 import { arrayMax } from '../../utils';
 
@@ -112,7 +112,7 @@ function WebGLGeometries(gl, attributes, infoMemory) {
 
         // console.timeEnd('wireframe');
 
-        attribute = new (arrayMax(indices) > 65535 ? Uint32BufferAttribute : Uint16BufferAttribute)(indices, 1);
+        attribute = new BufferAttribute(new (arrayMax(indices) > 65535 ? Uint32Array : Uint16Array)(indices), 1);
         attributes.update(attribute, gl.ELEMENT_ARRAY_BUFFER);
         wireframeAttributes[geometry.id] = attribute;
 
