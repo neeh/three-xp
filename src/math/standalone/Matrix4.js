@@ -394,9 +394,11 @@ Object.assign( Matrix4.prototype, {
 		var b41 = be[ 3 ], b42 = be[ 7 ], b43 = be[ 11 ], b44 = be[ 15 ];
 
 		te[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		// te[ 0 ] = ae[ 0 ] * be[ 0 ] + ae[ 4 ] * be[ 1 ] + ae[ 8 ] * be[ 2 ] + ae[ 12 ] * be[ 3 ];
 		te[ 4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
 		te[ 8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
 		te[ 12 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+		// te[ 12 ] = ae[ 0 ] * be[ 12 ] + ae[ 4 ] * be[ 13 ] + ae[ 8 ] * be[ 14 ] + ae[ 12 ] * be[ 15 ];
 
 		te[ 1 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
 		te[ 5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
@@ -406,6 +408,7 @@ Object.assign( Matrix4.prototype, {
 		te[ 2 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
 		te[ 6 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
 		te[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		// te[ 10 ] = ae[ 2 ] * be[ 8 ] + ae[ 6 ] * be[ 9 ] + ae[ 10 ] * be[ 10 ] + ae[ 14 ] * be[ 11 ];
 		te[ 14 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
 
 		te[ 3 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;

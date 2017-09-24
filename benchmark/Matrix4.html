@@ -13,21 +13,81 @@
     <script src="../src/math/standalone/Vector3.js"></script>
     <script src="../src/math/standalone/Quaternion.js"></script>
     <script src="../src/math/standalone/Matrix4.js"></script>
+    <script src="../src/math/standalone/CMatrix4.js"></script>
+    <script src="../src/math/standalone/CVector3.js"></script>
     <script src="../src/math/vec3.js"></script>
     <script src="../src/math/mtx4.js"></script>
     <script>
+        var _ = Math.random;
+
+        function randomMatrix4() {
+          var matrix = new Matrix4();
+          matrix.set(_(), _(), _(), 0.0,
+                     _(), _(), _(), 0.0,
+                     _(), _(), _(), 0.0,
+                     _(), _(), _(), 1.0);
+          return matrix;
+        }
+
+        function randomVector3() {
+          return new Vector3(_(), _(), _());
+        }
+
+        function Mtx4Rnd() {
+          var m4 = Mtx4Ident();
+          Mtx4Set(m4, _(), _(), _(), _(),
+                      _(), _(), _(), _(),
+                      _(), _(), _(), _(),
+                      0.0, 0.0, 0.0, 1.0);
+          return m4;
+        }
+
+        function Vec3Rnd() {
+          return Vec3(_(), _(), _());
+        }
+
+        function array_rnd() {
+          return [_(), _(), _(), _(),
+                  _(), _(), _(), _(),
+                  _(), _(), _(), _(),
+                  0.0, 0.0, 0.0, 1.0];
+        }
+
+        function randomCMatrix4() {
+          var matrix = new CMatrix4();
+          matrix.elements(_(), _(), _(), 0.0,
+                          _(), _(), _(), 0.0,
+                          _(), _(), _(), 0.0,
+                          _(), _(), _(), 1.0);
+          return matrix;
+        }
+
+        function randomCVector3() {
+          var v = new CVector3();
+          v.elements(_(), _(), _());
+          return v;
+        }
+
         function test_creation(numIters) {
-            console.log('-- creation: %s iters --', numIters);
-            console.time('new Matrix4()');
-            for (var i = 0; i < numIters; i++) {
-                var m = new Matrix4();
-            }
-            console.timeEnd('new Matrix4()');
-            console.time('Mtx4Ident()');
-            for (var i = 0; i < numIters; i++) {
-                var m = Mtx4Ident();
-            }
-            console.timeEnd('Mtx4Ident()');
+          console.log('-- creation: %s iters --', numIters);
+
+          console.time('new Matrix4()');
+          for (var i = 0; i < numIters; i++) {
+            var m = new Matrix4();
+          }
+          console.timeEnd('new Matrix4()');
+
+          console.time('Mtx4Ident()');
+          for (var i = 0; i < numIters; i++) {
+            var m = Mtx4Ident();
+          }
+          console.timeEnd('Mtx4Ident()');
+
+          console.time('new CMatrix4()');
+          for (var i = 0; i < numIters; i++) {
+            var m = new CMatrix4();
+          }
+          console.timeEnd('new CMatrix4()');
         }
 
         function test_set(numIters) {
@@ -35,32 +95,32 @@
             var matrix = new Matrix4();
             console.time('Matrix4.prototype.set()');
             for (var i = 0; i < numIters; i++) {
-                matrix.set(Math.random(), Math.random(), Math.random(), 0.0,
-                           Math.random(), Math.random(), Math.random(), 0.0,
-                           Math.random(), Math.random(), Math.random(), 0.0,
-                           Math.random(), Math.random(), Math.random(), 1.0);
+                matrix.set(_(), _(), _(), 0.0,
+                           _(), _(), _(), 0.0,
+                           _(), _(), _(), 0.0,
+                           _(), _(), _(), 1.0);
             }
             console.timeEnd('Matrix4.prototype.set()');
             var m4 = Mtx4Ident();
             console.time('Mtx4Set()');
             for (var i = 0; i < numIters; i++) {
-                Mtx4Set(m4, Math.random(), Math.random(), Math.random(), 0.0,
-                            Math.random(), Math.random(), Math.random(), 0.0,
-                            Math.random(), Math.random(), Math.random(), 0.0,
-                            Math.random(), Math.random(), Math.random(), 1.0);
+                Mtx4Set(m4, _(), _(), _(), 0.0,
+                            _(), _(), _(), 0.0,
+                            _(), _(), _(), 0.0,
+                            _(), _(), _(), 1.0);
             }
             console.timeEnd('Mtx4Set()');
             var array = new Float32Array(16);
-            var jsArray = [Math.random(), Math.random(), Math.random(), 0.0,
-                           Math.random(), Math.random(), Math.random(), 0.0,
-                           Math.random(), Math.random(), Math.random(), 0.0,
-                           Math.random(), Math.random(), Math.random(), 1.0];
+            var jsArray = [_(), _(), _(), 0.0,
+                           _(), _(), _(), 0.0,
+                           _(), _(), _(), 0.0,
+                           _(), _(), _(), 1.0];
             console.time('Float32Array.prototype.set(jsArray)');
             for (var i = 0; i < numIters; i++) {
-                Mtx4Set(jsArray, Math.random(), Math.random(), Math.random(), 0.0,
-                                 Math.random(), Math.random(), Math.random(), 0.0,
-                                 Math.random(), Math.random(), Math.random(), 0.0,
-                                 Math.random(), Math.random(), Math.random(), 1.0);
+                Mtx4Set(jsArray, _(), _(), _(), 0.0,
+                                 _(), _(), _(), 0.0,
+                                 _(), _(), _(), 0.0,
+                                 _(), _(), _(), 1.0);
                 array.set(jsArray);
             }
             console.timeEnd('Float32Array.prototype.set(jsArray)');
@@ -68,10 +128,10 @@
             float32Array = new Float32Array(16);
             console.time('Float32Array.prototype.set(float32Array)');
             for (var i = 0; i < numIters; i++) {
-                Mtx4Set(float32Array, Math.random(), Math.random(), Math.random(), 0.0,
-                                      Math.random(), Math.random(), Math.random(), 0.0,
-                                      Math.random(), Math.random(), Math.random(), 0.0,
-                                      Math.random(), Math.random(), Math.random(), 1.0);
+                Mtx4Set(float32Array, _(), _(), _(), 0.0,
+                                      _(), _(), _(), 0.0,
+                                      _(), _(), _(), 0.0,
+                                      _(), _(), _(), 1.0);
                 array.set(float32Array);
             }
             console.timeEnd('Float32Array.prototype.set(float32Array)');
@@ -79,19 +139,19 @@
 
         function test_reset(numIters) {
             console.log('-- reset: %s iters --', numIters);
-            var matrix = new Matrix4().set(Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 1.0);
+            var matrix = new Matrix4().set(_(), _(), _(), 0.0,
+                                           _(), _(), _(), 0.0,
+                                           _(), _(), _(), 0.0,
+                                           _(), _(), _(), 1.0);
             console.time('Matrix4.prototype.identity()');
             for (var i = 0; i < numIters; i++) {
                 matrix.identity();
             }
             console.timeEnd('Matrix4.prototype.identity()');
-            var m4 = Mtx4(Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 1.0);
+            var m4 = Mtx4(_(), _(), _(), 0.0,
+                          _(), _(), _(), 0.0,
+                          _(), _(), _(), 0.0,
+                          _(), _(), _(), 1.0);
             console.time('Mtx4Reset()');
             for (var i = 0; i < numIters; i++) {
                 Mtx4Reset(m4);
@@ -101,10 +161,10 @@
 
         function test_copy(numIters) {
             console.log('-- copy: %s iters --', numIters);
-            var matrix = new Matrix4().set(Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 1.0);
+            var matrix = new Matrix4().set(_(), _(), _(), 0.0,
+                                           _(), _(), _(), 0.0,
+                                           _(), _(), _(), 0.0,
+                                           _(), _(), _(), 1.0);
             var matrix2 = matrix.clone().multiplyScalar(5.0);
             var matrix3 = new Matrix4();
             console.time('Matrix4.prototype.copy()');
@@ -114,10 +174,10 @@
                 matrix.copy(matrix3);
             }
             console.timeEnd('Matrix4.prototype.copy()');
-            var m4 = Mtx4(Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 1.0);
+            var m4 = Mtx4(_(), _(), _(), 0.0,
+                          _(), _(), _(), 0.0,
+                          _(), _(), _(), 0.0,
+                          _(), _(), _(), 1.0);
             var m4_2 = Mtx4Null();
             Mtx4Cpy(m4_2, m4);
             var m4_3 = Mtx4Null();
@@ -131,38 +191,99 @@
         }
 
         function test_make_basis(numIters) {
-            console.log('-- make basis: %s iters --', numIters);
-            var matrix = new Matrix4().set(Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 0.0,
-                                           Math.random(), Math.random(), Math.random(), 1.0);
-            var xAxis = new Vector3(Math.random(), Math.random(), Math.random());
-            var yAxis = new Vector3(Math.random(), Math.random(), Math.random());
-            var zAxis = new Vector3(Math.random(), Math.random(), Math.random());
-            console.time('Matrix4.prototype.makeBasis()');
-            for (var i = 0; i < numIters; i++) {
-                matrix.makeBasis(xAxis, yAxis, zAxis);
-            }
-            console.timeEnd('Matrix4.prototype.makeBasis()');
-            var m4 = Mtx4(Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 0.0,
-                          Math.random(), Math.random(), Math.random(), 1.0);
-            xAxis = Vec3(Math.random(), Math.random(), Math.random());
-            yAxis = Vec3(Math.random(), Math.random(), Math.random());
-            zAxis = Vec3(Math.random(), Math.random(), Math.random());
-            console.time('Mtx4MakeBasis()');
-            for (var i = 0; i < numIters; i++) {
-                Mtx4MakeBasis(m4, xAxis, yAxis, zAxis);
-            }
-            console.timeEnd('Mtx4MakeBasis()');
+          console.log('-- make basis: %s iters --', numIters);
+
+          var matrix = randomMatrix4();
+          var xAxis = randomVector3();
+          var yAxis = randomVector3();
+          var zAxis = randomVector3();
+          console.time('Matrix4.prototype.makeBasis()');
+          for (var i = 0; i < numIters; i++) {
+            matrix.makeBasis(xAxis, yAxis, zAxis);
+          }
+          console.timeEnd('Matrix4.prototype.makeBasis()');
+
+          var m4 = Mtx4Rnd();
+          xAxis = Vec3Rnd();
+          yAxis = Vec3Rnd();
+          zAxis = Vec3Rnd();
+          console.time('Mtx4MakeBasis()');
+          for (var i = 0; i < numIters; i++) {
+            Mtx4MakeBasis(m4, xAxis, yAxis, zAxis);
+          }
+          console.timeEnd('Mtx4MakeBasis()');
+
+          var matrix2 = randomCMatrix4();
+          var xAxis2 = randomCVector3();
+          var yAxis2 = randomCVector3();
+          var zAxis2 = randomCVector3();
+          console.time('CMatrix4.prototype.makeBasis()');
+          for (var i = 0; i < numIters; i++) {
+            matrix2.makeBasis(xAxis2, yAxis2, zAxis2);
+          }
+          console.timeEnd('CMatrix4.prototype.makeBasis()');
+        }
+
+        function test_multiplication(numIters) {
+          console.log('-- multiplication: %s iters --', numIters);
+
+          var A = randomMatrix4();
+          var B = randomMatrix4();
+          var C = new Matrix4();
+
+          console.time('Matrix4.prototype.multiplyMatrices()');
+          for (var i = 0; i < numIters; i++) {
+            C.multiplyMatrices(A, B);
+          }
+          console.timeEnd('Matrix4.prototype.multiplyMatrices()');
+
+          var a = Mtx4Rnd();
+          var b = Mtx4Rnd();
+          var c = Mtx4Null();
+
+          console.time('Mtx4Cat()');
+          for (var i = 0; i < numIters; i++) {
+            Mtx4Cat(c, a, b);
+          }
+          console.timeEnd('Mtx4Cat()');
+
+          var a = Mtx4Rnd();
+          var b = Mtx4Rnd();
+          var c = Mtx4Null();
+
+          console.time('Mtx4Cat_()');
+          for (var i = 0; i < numIters; i++) {
+            Mtx4Cat_(c, a, b);
+          }
+          console.timeEnd('Mtx4Cat_()');
+
+          var A = randomCMatrix4();
+          var B = randomCMatrix4();
+          var C = new CMatrix4();
+
+          console.time('CMatrix4.prototype.multiplyMatrices()');
+          for (var i = 0; i < numIters; i++) {
+            C.multiplyMatrices(A, B);
+          }
+          console.timeEnd('CMatrix4.prototype.multiplyMatrices()');
+
+          var A = randomCMatrix4();
+          var B = randomCMatrix4();
+          var C = new CMatrix4();
+
+          console.time('CMatrix4.prototype.multiplyMatrices_()');
+          for (var i = 0; i < numIters; i++) {
+            C.multiplyMatrices_(A, B);
+          }
+          console.timeEnd('CMatrix4.prototype.multiplyMatrices_()');
         }
 
         // test_creation(5e5);
-        test_set(1e7);
+        // test_set(1e7);
         // test_reset(5e7);
         // test_copy(5e7);
-        // test_make_basis(1e8);
+        test_make_basis(1e5);
+        test_multiplication(1e3);
     </script>
 </body>
 </html>
