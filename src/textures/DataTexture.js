@@ -1,6 +1,7 @@
 import { Texture } from './Texture';
 import { NearestFilter } from '../constants';
 
+
 function DataTexture(data, width, height, format, type, mapping, wrapS, wrapT, magFilter, minFilter, anisotropy, encoding) {
   Texture.call(this, null, mapping, wrapS, wrapT, magFilter, minFilter, format, type, anisotropy, encoding);
 

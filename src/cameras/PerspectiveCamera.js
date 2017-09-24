@@ -57,7 +57,7 @@ PerspectiveCamera.prototype = Object.assign(Object.create(Camera.prototype), {
    *
    * Values for focal length and film gauge must have the same unit.
    */
-  setFocalLength: function ( focalLength ) {
+  setFocalLength: function (focalLength) {
     // see http://www.bobatkins.com/photography/technical/field_of_view.html
     var vExtentSlope = 0.5 * this.getFilmHeight() / focalLength;
 
@@ -68,10 +68,10 @@ PerspectiveCamera.prototype = Object.assign(Object.create(Camera.prototype), {
   /**
    * Calculates the focal length from the current .fov and .filmGauge.
    */
-   getFocalLength: function () {
-     var vExtentSlope = Math.tan(_Math.DEG2RAD * 0.5 * this.fov);
-     return 0.5 * this.getFilmHeight() / vExtentSlope;
-   },
+  getFocalLength: function () {
+    var vExtentSlope = Math.tan(_Math.DEG2RAD * 0.5 * this.fov);
+    return 0.5 * this.getFilmHeight() / vExtentSlope;
+  },
 
   getEffectiveFOV: function () {
     return _Math.RAD2DEG * 2 * Math.atan(Math.tan(_Math.DEG2RAD * 0.5 * this.fov) / this.zoom);

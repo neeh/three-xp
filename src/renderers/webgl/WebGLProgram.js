@@ -273,7 +273,7 @@ function WebGLProgram(renderer, code, material/*, parameters */) {
         this.program = undefined;
     };
 
-    this.id = programIdCount ++;
+    this.id = programIdCount++;
     this.code = code;
     this.usedTimes = 1;
     this.program = program;
