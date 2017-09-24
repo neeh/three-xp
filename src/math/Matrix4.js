@@ -460,7 +460,7 @@ Object.assign(Matrix4.prototype, {
       if (throwOnDegenerate === true) {
         throw new Error(msg);
       } else {
-        console.warn( msg );
+        console.warn(msg);
       }
 
       return this.identity();
@@ -563,7 +563,7 @@ Object.assign(Matrix4.prototype, {
     return this;
   },
 
-  makeRotationAxis: function ( axis, angle ) { // UNUSED
+  makeRotationAxis: function (axis, angle) { // UNUSED
     // Based on http://www.gamedev.net/reference/articles/article1199.asp
     var c = Math.cos(angle);
     var s = Math.sin(angle);

@@ -1,56 +1,56 @@
 
 function WebGLIndexedBufferRenderer(gl, extensions, infoRender) {
-    var mode;
+  var mode;
 
-    function setMode(value) {
-        mode = value;
+  function setMode(value) {
+    mode = value;
+  }
+
+  var type;
+  var size;
+
+  function setIndex(index) {
+    // TODO: Use index.BYTES_PER_ELEMENT ?
+    if (index.array instanceof Uint32Array && extensions.get('OES_element_index_uint')) {
+      type = gl.UNSIGNED_INT;
+      size = 4;
+    } else if (index.array instanceof Uint16Array) {
+      type = gl.UNSIGNED_SHORT;
+      size = 2;
+    } else {
+      type = gl.UNSIGNED_BYTE;
+      size = 1;
+    }
+  }
+
+  function render(start, count) {
+    gl.drawElements(mode, count, type, start * size);
+
+    infoRender.calls++;
+    infoRender.vertices += count;
+
+    if (mode === gl.TRIANGLES) infoRender.faces += count / 3;
+  }
+
+  function renderInstances(geometry, start, count) {
+    var extension = extensions.get('ANGLE_instanced_arrays');
+    if (extension === null) {
+      console.error('WebGLIndexedBufferRenderer: using InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.');
+      return;
     }
 
-    var type;
-    var size;
+    extension.drawElementsInstancedANGLE(mode, count, type, start * size, geometry.maxInstancedCount);
 
-    function setIndex(index) {
-        // TODO: Use index.BYTES_PER_ELEMENT ?
-        if (index.array instanceof Uint32Array && extensions.get('OES_element_index_uint')) {
-            type = gl.UNSIGNED_INT;
-            size = 4;
-        } else if (index.array instanceof Uint16Array) {
-            type = gl.UNSIGNED_SHORT;
-            size = 2;
-        } else {
-            type = gl.UNSIGNED_BYTE;
-            size = 1;
-        }
-    }
+    infoRender.calls++;
+    infoRender.vertices += count * geometry.maxInstancedCount;
 
-    function render(start, count) {
-        gl.drawElements(mode, count, type, start * size);
+    if (mode === gl.TRIANGLES) infoRender.faces += geometry.maxInstancedCount * count / 3;
+  }
 
-        infoRender.calls ++;
-        infoRender.vertices += count;
-
-        if (mode === gl.TRIANGLES) infoRender.faces += count / 3;
-    }
-
-    function renderInstances(geometry, start, count) {
-        var extension = extensions.get('ANGLE_instanced_arrays');
-        if (extension === null) {
-            console.error('WebGLIndexedBufferRenderer: using InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.');
-            return;
-        }
-
-        extension.drawElementsInstancedANGLE(mode, count, type, start * size, geometry.maxInstancedCount);
-
-        infoRender.calls ++;
-        infoRender.vertices += count * geometry.maxInstancedCount;
-
-        if (mode === gl.TRIANGLES) infoRender.faces += geometry.maxInstancedCount * count / 3;
-    }
-
-    this.setMode = setMode;
-    this.setIndex = setIndex;
-    this.render = render;
-    this.renderInstances = renderInstances;
+  this.setMode = setMode;
+  this.setIndex = setIndex;
+  this.render = render;
+  this.renderInstances = renderInstances;
 }
 
 

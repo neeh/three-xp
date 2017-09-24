@@ -1,44 +1,44 @@
 
 function WebGLBufferRenderer(gl, extensions, infoRender) {
-    var mode;
+  var mode;
 
-    function setMode(value) {
-        mode = value;
+  function setMode(value) {
+    mode = value;
+  }
+
+  function render(start, count) {
+    gl.drawArrays(mode, start, count);
+
+    infoRender.calls++;
+    infoRender.vertices += count;
+
+    if (mode === gl.TRIANGLES) infoRender.faces += count / 3;
+  }
+
+  function renderInstances(geometry, start, count) {
+    var extension = extensions.get('ANGLE_instanced_arrays');
+    if (extension === null) {
+      console.error('WebGLBufferRenderer: using InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.');
+      return;
     }
 
-    function render(start, count) {
-        gl.drawArrays(mode, start, count);
-
-        infoRender.calls ++;
-        infoRender.vertices += count;
-
-        if (mode === gl.TRIANGLES) infoRender.faces += count / 3;
+    var position = geometry.attributes.position;
+    if (position.isInterleavedBufferAttribute) {
+      count = position.data.count;
+      extension.drawArraysInstancedANGLE(mode, 0, count, geometry.maxInstancedCount);
+    } else {
+      extension.drawArraysInstancedANGLE(mode, start, count, geometry.maxInstancedCount);
     }
 
-    function renderInstances(geometry, start, count) {
-        var extension = extensions.get('ANGLE_instanced_arrays');
-        if (extension === null) {
-            console.error('WebGLBufferRenderer: using InstancedBufferGeometry but hardware does not support extension ANGLE_instanced_arrays.');
-            return;
-        }
+    infoRender.calls++;
+    infoRender.vertices += count * geometry.maxInstancedCount;
 
-        var position = geometry.attributes.position;
-        if (position.isInterleavedBufferAttribute) {
-            count = position.data.count;
-            extension.drawArraysInstancedANGLE(mode, 0, count, geometry.maxInstancedCount);
-        } else {
-            extension.drawArraysInstancedANGLE(mode, start, count, geometry.maxInstancedCount);
-        }
+    if (mode === gl.TRIANGLES) infoRender.faces += geometry.maxInstancedCount * count / 3;
+  }
 
-        infoRender.calls ++;
-        infoRender.vertices += count * geometry.maxInstancedCount;
-
-        if (mode === gl.TRIANGLES) infoRender.faces += geometry.maxInstancedCount * count / 3;
-    }
-
-    this.setMode = setMode;
-    this.render = render;
-    this.renderInstances = renderInstances;
+  this.setMode = setMode;
+  this.render = render;
+  this.renderInstances = renderInstances;
 }
 
 

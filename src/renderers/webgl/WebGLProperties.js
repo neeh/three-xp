@@ -1,32 +1,33 @@
 
 function WebGLProperties() {
-    var properties = {};
+  var properties = {};
 
-    function get(object) {
-        var uuid = object.uuid;
-        var map = properties[uuid];
+  function get(object) {
+    var uuid = object.uuid;
+    var map = properties[uuid];
 
-        if (map === undefined) {
-            map = {};
-            properties[uuid] = map;
-        }
-
-        return map;
+    if (map === undefined) {
+      map = {};
+      properties[uuid] = map;
     }
 
-    function remove(object) {
-        delete properties[object.uuid];
-    }
+    return map;
+  }
 
-    function clear() {
-        properties = {};
-    }
+  function remove(object) {
+    delete properties[object.uuid];
+  }
 
-    return {
-        get: get,
-        remove: remove,
-        clear: clear
-    };
+  function clear() {
+    properties = {};
+  }
+
+  return {
+    get: get,
+    remove: remove,
+    clear: clear
+  };
 }
+
 
 export { WebGLProperties };
